@@ -31,6 +31,10 @@ export function useAuth() {
           if (response) {
             console.log('User data received:', response)
             setUser(response)
+            // Сохраняем пользователя в localStorage
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('user', JSON.stringify(response))
+            }
             setIsAuthenticated(true)
             console.log('User authenticated successfully')
           } else {
@@ -73,8 +77,14 @@ export function useAuth() {
         if (response.user) {
           console.log('User data from login response:', response.user)
           setUser(response.user)
+          // Сохраняем пользователя в localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('user', JSON.stringify(response.user))
+            console.log('User saved to localStorage:', JSON.stringify(response.user))
+          }
           console.log('User state updated with login response data')
         } else {
+          console.log('No user data in login response')
           // Если нет данных пользователя в ответе login, получаем их отдельно
           try {
             console.log('Getting user data from /user endpoint...')
@@ -82,6 +92,11 @@ export function useAuth() {
             console.log('User response from /user endpoint:', userResponse)
             if (userResponse && typeof userResponse === 'object') {
               setUser(userResponse)
+              // Сохраняем пользователя в localStorage
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('user', JSON.stringify(userResponse))
+                console.log('User saved to localStorage from /user endpoint:', JSON.stringify(userResponse))
+              }
               console.log('User data from /user endpoint:', userResponse)
             }
           } catch (userError) {
