@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MapPin, Calendar, Clock, Users, Plus, Edit, Trash2, Car, MessageCircle, Search } from "lucide-react"
+import { MapPin, Calendar, Clock, Users, Plus, Edit, Trash2, Car, MessageCircle, Search, LogOut } from "lucide-react"
 import { useTrips } from "@/hooks/use-trips"
 import { CreateTripModal } from "@/components/trips/create-trip-modal"
 import EditTripModal from "@/components/trips/edit-trip-modal"
@@ -23,7 +23,7 @@ export default function MyTripsPage() {
   const hasFetched = useRef(false)
 
   const { myTrips, isLoading, fetchMyTrips } = useTrips()
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -32,6 +32,15 @@ export default function MyTripsPage() {
       fetchMyTrips()
     }
   }, [fetchMyTrips])
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      router.push("/")
+    } catch (error) {
+      console.error("Logout error:", error)
+    }
+  }
 
   const handleEditTrip = (trip: any) => {
     setSelectedTrip(trip)
@@ -167,6 +176,14 @@ export default function MyTripsPage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать, {user?.name}!</h1>
             <p className="text-gray-600">Управляйте своими поездками и найдите попутчиков</p>
           </div>
+          <Button 
+            onClick={handleLogout} 
+            variant="outline"
+            className="bg-white/80 backdrop-blur-lg border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Выйти
+          </Button>
         </div>
 
         {/* Quick Actions */}
