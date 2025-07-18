@@ -12,18 +12,19 @@ export default function TripsPage() {
   const hasFetched = useRef(false)
 
   useEffect(() => {
+    console.log('=== TRIPS PAGE: useEffect triggered ===')
     console.log('TripsPage: isAuthenticated =', isAuthenticated)
     console.log('TripsPage: user =', user)
     
     if (!isAuthenticated) {
-      console.log('TripsPage: Not authenticated, redirecting to /')
+      console.log('=== TRIPS PAGE: Not authenticated, redirecting to /')
       router.push("/")
       return
     }
     
     // Загружаем поездки только один раз при первой аутентификации
     if (isAuthenticated && !hasFetched.current) {
-      console.log('TripsPage: Authenticated, fetching trips (first time)')
+      console.log('=== TRIPS PAGE: Authenticated, fetching trips (first time)')
       hasFetched.current = true
       fetchAllTrips()
     }

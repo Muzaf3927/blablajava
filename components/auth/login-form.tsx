@@ -44,19 +44,19 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToReset }: Login
 
     try {
       const response = await login(formData)
-      console.log('Login successful, response:', response)
+      console.log('=== LOGIN FORM: Login successful, response:', response)
       
       // Проверяем что пользователь действительно аутентифицирован
-      if (response.data?.access_token) {
-        console.log('Login successful, redirecting to /trips')
+      if (response?.access_token) {
+        console.log('=== LOGIN FORM: Access token found, redirecting to /trips')
         // Используем Next.js router для редиректа
         router.push("/trips")
       } else {
-        console.log('No access_token in response')
+        console.log('=== LOGIN FORM: No access_token in response')
         setErrors({ general: "Ошибка получения токена доступа" })
       }
     } catch (error: any) {
-      console.error('Login failed:', error)
+      console.error('=== LOGIN FORM: Login failed:', error)
       setErrors({ general: error.message || "Ошибка входа" })
     }
   }

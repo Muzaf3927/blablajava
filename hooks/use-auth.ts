@@ -12,19 +12,28 @@ export function useAuth() {
   // Проверяем токен при загрузке
   useEffect(() => {
     const checkAuth = async () => {
+      console.log('=== AUTH CHECK START ===')
       console.log('Checking auth on mount...')
       const token = apiClient.getToken()
       console.log('Token found:', !!token)
+      console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null')
       
       if (token) {
         try {
+          console.log('Making request to get current user...')
           const response = await apiClient.getCurrentUser()
           console.log('Current user response:', response)
           
-          if (response.data) {
-            setUser(response.data)
+          if (response) {
+            console.log('User data received:', response)
+            setUser(response)
             setIsAuthenticated(true)
-            console.log('User authenticated:', response.data)
+            console.log('User authenticated successfully')
+          } else {
+            console.log('No user data in response')
+            apiClient.clearToken()
+            setUser(null)
+            setIsAuthenticated(false)
           }
         } catch (error) {
           console.error("Auth check failed:", error)
@@ -37,6 +46,7 @@ export function useAuth() {
         setUser(null)
         setIsAuthenticated(false)
       }
+      console.log('=== AUTH CHECK END ===')
     }
 
     checkAuth()
@@ -45,33 +55,40 @@ export function useAuth() {
   const login = async (credentials: LoginForm) => {
     setIsLoading(true)
     try {
+      console.log('=== LOGIN START ===')
       console.log('Attempting login with:', credentials)
       const response = await apiClient.login(credentials)
       console.log('Login response:', response)
       
-      if (response.data?.access_token) {
+      if (response?.access_token) {
+        console.log('Access token found:', response.access_token)
         setIsAuthenticated(true)
         console.log('Login successful, token saved')
         
         // Если есть данные пользователя в ответе login, используем их
-        if (response.data.user) {
-          setUser(response.data.user)
-          console.log('User data from login response:', response.data.user)
+        if (response.user) {
+          console.log('User data from login response:', response.user)
+          setUser(response.user)
+          console.log('User state updated with login response data')
         } else {
           // Если нет данных пользователя в ответе login, получаем их отдельно
           try {
             console.log('Getting user data from /user endpoint...')
             const userResponse = await apiClient.getCurrentUser()
-                         if (userResponse.data && typeof userResponse.data === 'object') {
-               setUser(userResponse.data)
-               console.log('User data from /user endpoint:', userResponse.data)
-             }
+            console.log('User response from /user endpoint:', userResponse)
+            if (userResponse && typeof userResponse === 'object') {
+              setUser(userResponse)
+              console.log('User data from /user endpoint:', userResponse)
+            }
           } catch (userError) {
             console.error('Failed to get user data:', userError)
           }
         }
+      } else {
+        console.log('No access_token in response')
       }
       
+      console.log('=== LOGIN END ===')
       return response
     } catch (error) {
       console.error('Login error:', error)

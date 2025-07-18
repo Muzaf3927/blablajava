@@ -45,7 +45,7 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const token = this.getToken();
 
@@ -73,7 +73,7 @@ class ApiClient {
       }
 
       // Laravel возвращает данные напрямую, а не в data поле
-      return { data: data };
+      return data;
     } catch (error) {
       console.error('API request failed:', error);
       throw error;
@@ -88,7 +88,7 @@ class ApiClient {
     });
   }
 
-  async login(credentials: LoginForm) {
+  async login(credentials: LoginForm): Promise<AuthResponse> {
     console.log('API: Sending login request with:', credentials)
     const response = await this.request<AuthResponse>('/login', {
       method: 'POST',
@@ -97,9 +97,9 @@ class ApiClient {
     
     console.log('API: Login response received:', response)
     
-    // Laravel возвращает данные напрямую в response.data
-    if (response.data?.access_token) {
-      this.setToken(response.data.access_token);
+    // Laravel возвращает данные напрямую
+    if (response?.access_token) {
+      this.setToken(response.access_token);
       console.log('API: Token saved successfully')
     } else {
       console.log('API: No access_token in response')
@@ -124,7 +124,7 @@ class ApiClient {
   }
 
   // User endpoints
-  async getCurrentUser() {
+  async getCurrentUser(): Promise<User> {
     console.log('API: Getting current user...')
     const response = await this.request<User>('/user');
     console.log('API: Current user response:', response)
