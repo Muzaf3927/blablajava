@@ -159,6 +159,7 @@ export interface TripForm {
 
 export interface BookingForm {
   seats: number;
+  status?: 'pending' | 'approved' | 'rejected' | 'cancelled';
 }
 
 export interface MessageForm {

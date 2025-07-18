@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useTrips } from "@/hooks/use-trips"
 import { CreateTripModal } from "@/components/trips/create-trip-modal"
 import TripFilters from "@/components/trips/trip-filters"
+import BookTripModal from "@/components/bookings/book-trip-modal"
 
 export default function TripsPage() {
   const { user, isAuthenticated } = useAuth()
@@ -19,6 +20,8 @@ export default function TripsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [filteredTrips, setFilteredTrips] = useState(trips)
+  const [selectedTrip, setSelectedTrip] = useState<any>(null)
+  const [showBookModal, setShowBookModal] = useState(false)
 
   console.log('=== TRIPS PAGE: Component rendered ===')
   console.log('TripsPage: isAuthenticated =', isAuthenticated)
@@ -183,7 +186,14 @@ export default function TripsPage() {
             </div>
           </div>
 
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button 
+            size="sm" 
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => {
+              setSelectedTrip(trip)
+              setShowBookModal(true)
+            }}
+          >
             Забронировать
           </Button>
         </div>
@@ -280,6 +290,23 @@ export default function TripsPage() {
 
       {/* Create Trip Modal */}
       <CreateTripModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      
+      {/* Book Trip Modal */}
+      {selectedTrip && (
+        <BookTripModal
+          isOpen={showBookModal}
+          trip={selectedTrip}
+          onClose={() => {
+            setShowBookModal(false)
+            setSelectedTrip(null)
+          }}
+          onSuccess={() => {
+            setShowBookModal(false)
+            setSelectedTrip(null)
+            // Можно добавить уведомление об успешном бронировании
+          }}
+        />
+      )}
     </div>
   )
 }

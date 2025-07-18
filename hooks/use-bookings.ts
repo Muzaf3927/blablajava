@@ -1,66 +1,127 @@
 "use client"
 
 import { useState } from "react"
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
-
-interface Booking {
-  id: number
-  status: "confirmed" | "completed" | "cancelled"
-  seats: number
-  total_price: number
-  rated: boolean
-  trip?: {
-    from_city: string
-    to_city: string
-    date: string
-    time: string
-    user_id: number
-    driver?: {
-      name: string
-      rating: number
-      rating_count: number
-      avatar?: string
-    }
-  }
-}
+import { apiClient } from "@/lib/api"
+import { Booking, BookingForm } from "@/lib/types"
 
 export function useBookings() {
   const [bookings, setBookings] = useState<Booking[]>([])
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchBookings = async () => {
-    setLoading(true)
+    setIsLoading(true)
+    setError(null)
     try {
-      const token = localStorage.getItem("auth_token")
-      if (!token) {
-        throw new Error("No auth token")
-      }
-
-      const response = await fetch(`${API_BASE_URL}/bookings`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch bookings")
-      }
-
-      const data = await response.json()
-      setBookings(data.bookings || [])
-    } catch (error) {
-      console.error("Error fetching bookings:", error)
+      console.log('=== BOOKINGS: Fetching my bookings ===')
+      const response = await apiClient.getMyBookings()
+      console.log('=== BOOKINGS: My bookings response ===', response)
+      setBookings(response || [])
+    } catch (err) {
+      console.error('=== BOOKINGS: Error fetching bookings ===', err)
+      setError(err instanceof Error ? err.message : "Ошибка загрузки бронирований")
       setBookings([])
     } finally {
-      setLoading(false)
+      setIsLoading(false)
+    }
+  }
+
+  const createBooking = async (tripId: number, seats: number) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      console.log('=== BOOKINGS: Creating booking ===', { tripId, seats })
+      const bookingData: BookingForm = { seats }
+      const response = await apiClient.createBooking(tripId, bookingData)
+      console.log('=== BOOKINGS: Create booking response ===', response)
+      
+      // Добавляем новое бронирование в список
+      setBookings((prev: Booking[]) => [response, ...prev])
+      
+      console.log('=== BOOKINGS: Booking created successfully ===')
+      return response
+    } catch (err) {
+      console.error('=== BOOKINGS: Error creating booking ===', err)
+      setError(err instanceof Error ? err.message : "Ошибка создания бронирования")
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchTripBookings = async (tripId: number) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      console.log('=== BOOKINGS: Fetching trip bookings ===', tripId)
+      const response = await apiClient.getTripBookings(tripId)
+      console.log('=== BOOKINGS: Trip bookings response ===', response)
+      return { bookings: response || [] }
+    } catch (err) {
+      console.error('=== BOOKINGS: Error fetching trip bookings ===', err)
+      setError(err instanceof Error ? err.message : "Ошибка загрузки бронирований поездки")
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const updateBookingStatus = async (bookingId: number, status: 'approved' | 'rejected') => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      console.log('=== BOOKINGS: Updating booking status ===', { bookingId, status })
+      const response = await apiClient.updateBooking(bookingId, { status })
+      console.log('=== BOOKINGS: Update booking status response ===', response)
+      
+      // Обновляем бронирование в списке
+      setBookings((prev: Booking[]) => prev.map((booking: Booking) => 
+        booking.id === bookingId ? response : booking
+      ))
+      
+      console.log('=== BOOKINGS: Booking status updated successfully ===')
+      return response
+    } catch (err) {
+      console.error('=== BOOKINGS: Error updating booking status ===', err)
+      setError(err instanceof Error ? err.message : "Ошибка обновления статуса бронирования")
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const cancelBooking = async (bookingId: number) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      console.log('=== BOOKINGS: Cancelling booking ===', bookingId)
+      const response = await apiClient.cancelBooking(bookingId)
+      console.log('=== BOOKINGS: Cancel booking response ===', response)
+      
+      // Обновляем бронирование в списке
+      setBookings((prev: Booking[]) => prev.map((booking: Booking) => 
+        booking.id === bookingId ? response : booking
+      ))
+      
+      console.log('=== BOOKINGS: Booking cancelled successfully ===')
+      return response
+    } catch (err) {
+      console.error('=== BOOKINGS: Error cancelling booking ===', err)
+      setError(err instanceof Error ? err.message : "Ошибка отмены бронирования")
+      throw err
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return {
     bookings,
-    loading,
+    isLoading,
+    error,
     fetchBookings,
+    createBooking,
+    fetchTripBookings,
+    updateBookingStatus,
+    cancelBooking,
   }
 }
