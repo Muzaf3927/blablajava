@@ -1,14 +1,23 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation"
 import LoginForm from "@/components/auth/login-form"
 import RegisterForm from "@/components/auth/register-form"
 import ResetPasswordForm from "@/components/auth/reset-password-form"
 import { Car, Users, Shield, Star, ArrowRight, Sparkles } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Загрузка...</div>}>
+      <HomePageContent />
+    </Suspense>
+  );
+}
+
+function HomePageContent() {
   const searchParams = useSearchParams()
   const [currentForm, setCurrentForm] = useState<"login" | "register" | "reset">("login")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
