@@ -14,11 +14,18 @@ export function useTrips() {
     setIsLoading(true)
     setError(null)
     try {
+      console.log('=== TRIPS: Fetching all trips ===')
       const response = await apiClient.getAllTrips()
-      if (response.data?.trips) {
-        setTrips(response.data.trips)
+      console.log('=== TRIPS: All trips response ===', response)
+      if (response?.trips) {
+        setTrips(response.trips)
+        console.log('=== TRIPS: Set trips ===', response.trips)
+      } else {
+        console.log('=== TRIPS: No trips in response ===')
+        setTrips([])
       }
     } catch (err) {
+      console.error('=== TRIPS: Error fetching all trips ===', err)
       setError(err instanceof Error ? err.message : "Ошибка загрузки поездок")
     } finally {
       setIsLoading(false)
@@ -29,11 +36,18 @@ export function useTrips() {
     setIsLoading(true)
     setError(null)
     try {
+      console.log('=== TRIPS: Fetching my trips ===')
       const response = await apiClient.getMyTrips()
-      if (response.data?.trips) {
-        setMyTrips(response.data.trips)
+      console.log('=== TRIPS: My trips response ===', response)
+      if (response?.trips) {
+        setMyTrips(response.trips)
+        console.log('=== TRIPS: Set my trips ===', response.trips)
+      } else {
+        console.log('=== TRIPS: No my trips in response ===')
+        setMyTrips([])
       }
     } catch (err) {
+      console.error('=== TRIPS: Error fetching my trips ===', err)
       setError(err instanceof Error ? err.message : "Ошибка загрузки моих поездок")
     } finally {
       setIsLoading(false)
@@ -44,13 +58,17 @@ export function useTrips() {
     setIsLoading(true)
     setError(null)
     try {
+      console.log('=== TRIPS: Creating trip ===', tripData)
       const response = await apiClient.createTrip(tripData)
-      if (response.data?.trip) {
-        setMyTrips((prev: Trip[]) => [response.data.trip, ...prev])
-        setTrips((prev: Trip[]) => [response.data.trip, ...prev])
+      console.log('=== TRIPS: Create trip response ===', response)
+      if (response?.trip) {
+        setMyTrips((prev: Trip[]) => [response.trip, ...prev])
+        setTrips((prev: Trip[]) => [response.trip, ...prev])
+        console.log('=== TRIPS: Trip created successfully ===')
       }
       return response
     } catch (err) {
+      console.error('=== TRIPS: Error creating trip ===', err)
       setError(err instanceof Error ? err.message : "Ошибка создания поездки")
       throw err
     } finally {
@@ -62,17 +80,21 @@ export function useTrips() {
     setIsLoading(true)
     setError(null)
     try {
+      console.log('=== TRIPS: Updating trip ===', tripId, tripData)
       const response = await apiClient.updateTrip(tripId, tripData)
-      if (response.data) {
+      console.log('=== TRIPS: Update trip response ===', response)
+      if (response?.trip) {
         setMyTrips(prev => prev.map(trip => 
-          trip.id === tripId ? response.data : trip
+          trip.id === tripId ? response.trip : trip
         ))
         setTrips(prev => prev.map(trip => 
-          trip.id === tripId ? response.data : trip
+          trip.id === tripId ? response.trip : trip
         ))
+        console.log('=== TRIPS: Trip updated successfully ===')
       }
       return response
     } catch (err) {
+      console.error('=== TRIPS: Error updating trip ===', err)
       setError(err instanceof Error ? err.message : "Ошибка обновления поездки")
       throw err
     } finally {
