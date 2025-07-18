@@ -10,7 +10,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3030
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api  # Замените на ваш API URL
+      - NEXT_PUBLIC_API_URL=https://blabla-main.laravel.cloud/api  # Замените на ваш API URL
     container_name: nextjs_frontend
     restart: unless-stopped
     healthcheck:

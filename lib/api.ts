@@ -5,7 +5,7 @@ import {
   MessageForm, RatingForm, DepositForm 
 } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://blabla-main.laravel.cloud/api';
 
 interface ApiResponse<T = any> {
   data?: T;
