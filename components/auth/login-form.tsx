@@ -103,6 +103,7 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToReset }: Login
                       className={`pl-10 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400/20 ${
                           errors.phone ? "border-red-500 focus:border-red-500" : ""
                       }`}
+                      autoComplete="tel"
                   />
                 </div>
                 {errors.phone && (
@@ -132,6 +133,7 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToReset }: Login
                       className={`pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400/20 ${
                           errors.password ? "border-red-500 focus:border-red-500" : ""
                       }`}
+                      autoComplete="current-password"
                   />
                   <button
                       type="button"
