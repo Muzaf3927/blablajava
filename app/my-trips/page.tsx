@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MapPin, Calendar, Clock, Users, Plus, Edit, Trash2, Car, MessageCircle } from "lucide-react"
+import { MapPin, Calendar, Clock, Users, Plus, Edit, Trash2, Car, MessageCircle, Search } from "lucide-react"
 import { useTrips } from "@/hooks/use-trips"
 import { CreateTripModal } from "@/components/trips/create-trip-modal"
 import EditTripModal from "@/components/trips/edit-trip-modal"
 import DeleteTripModal from "@/components/trips/delete-trip-modal"
 import TripBookingsModal from "@/components/bookings/trip-bookings-modal"
+import { useAuth } from "@/hooks/use-auth"
+import { useRouter } from "next/navigation"
 
 export default function MyTripsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -21,6 +23,8 @@ export default function MyTripsPage() {
   const hasFetched = useRef(false)
 
   const { myTrips, isLoading, fetchMyTrips } = useTrips()
+  const { user } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     if (!hasFetched.current) {
@@ -160,118 +164,162 @@ export default function MyTripsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Мои поездки</h1>
-            <p className="text-gray-600">Управляйте своими поездками и просматривайте бронирования</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать, {user?.name}!</h1>
+            <p className="text-gray-600">Управляйте своими поездками и найдите попутчиков</p>
           </div>
-          <Button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg mt-4 sm:mt-0"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Создать поездку
-          </Button>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="active" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/80 backdrop-blur-lg border-0 shadow-lg">
-            <TabsTrigger value="active" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Активные ({activeTrips.length})
-            </TabsTrigger>
-            <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-              Завершенные ({completedTrips.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="active" className="mt-6">
-            {activeTrips.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activeTrips.map((trip) => (
-                  <TripCard key={trip.id} trip={trip} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Car className="w-12 h-12 text-gray-400" />
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <Plus className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Нет активных поездок</h3>
-                <p className="text-gray-600 mb-6">Создайте свою первую поездку и найдите попутчиков</p>
-                <Button
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Создать поездку
-                </Button>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="completed" className="mt-6">
-            {completedTrips.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {completedTrips.map((trip) => (
-                  <TripCard key={trip.id} trip={trip} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-12 h-12 text-gray-400" />
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-2">Создать поездку</h3>
+                  <p className="text-blue-100 mb-4">Предложите поездку и найдите попутчиков</p>
+                  <Button
+                    onClick={() => setShowCreateModal(true)}
+                    className="bg-white text-blue-600 hover:bg-blue-50"
+                  >
+                    Создать поездку
+                  </Button>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Нет завершенных поездок</h3>
-                <p className="text-gray-600">Здесь будут отображаться ваши завершенные поездки</p>
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <Search className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold mb-2">Найти поездку</h3>
+                  <p className="text-purple-100 mb-4">Найдите подходящую поездку и забронируйте место</p>
+                  <Button
+                    onClick={() => router.push("/trips")}
+                    className="bg-white text-purple-600 hover:bg-purple-50"
+                  >
+                    Найти поездку
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* My Trips Section */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Мои поездки</h2>
+              <p className="text-gray-600">Управляйте своими поездками и просматривайте бронирования</p>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <Tabs defaultValue="active" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-white/80 backdrop-blur-lg border-0 shadow-lg">
+              <TabsTrigger value="active" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Активные ({activeTrips.length})
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Завершенные ({completedTrips.length})
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="active" className="mt-6">
+              {activeTrips.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {activeTrips.map((trip) => (
+                    <TripCard key={trip.id} trip={trip} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Car className="w-12 h-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Нет активных поездок</h3>
+                  <p className="text-gray-600 mb-6">Создайте свою первую поездку и найдите попутчиков</p>
+                  <Button
+                    onClick={() => setShowCreateModal(true)}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Создать поездку
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="completed" className="mt-6">
+              {completedTrips.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {completedTrips.map((trip) => (
+                    <TripCard key={trip.id} trip={trip} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Car className="w-12 h-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Нет завершенных поездок</h3>
+                  <p className="text-gray-600">Завершенные поездки появятся здесь</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-center space-x-4">
+          <Button
+            onClick={() => router.push("/trips")}
+            variant="outline"
+            className="bg-white/80 backdrop-blur-lg border-gray-200"
+          >
+            Все поездки
+          </Button>
+          <Button
+            onClick={() => router.push("/")}
+            variant="outline"
+            className="bg-white/80 backdrop-blur-lg border-gray-200"
+          >
+            Вернуться на главную
+          </Button>
+        </div>
       </div>
 
       {/* Modals */}
-      <CreateTripModal
-        isOpen={showCreateModal}
-        onClose={() => {
-          fetchMyTrips()
-          setShowCreateModal(false)
-        }}
-      />
-
+      <CreateTripModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
       <EditTripModal
         isOpen={showEditModal}
         trip={selectedTrip}
-        onClose={() => {
-          setShowEditModal(false)
-          setSelectedTrip(null)
-        }}
+        onClose={() => setShowEditModal(false)}
         onSuccess={() => {
-          fetchMyTrips()
           setShowEditModal(false)
-          setSelectedTrip(null)
+          fetchMyTrips()
         }}
       />
-
       <DeleteTripModal
         isOpen={showDeleteModal}
         trip={selectedTrip}
-        onClose={() => {
-          setShowDeleteModal(false)
-          setSelectedTrip(null)
-        }}
+        onClose={() => setShowDeleteModal(false)}
         onSuccess={() => {
-          fetchMyTrips()
           setShowDeleteModal(false)
-          setSelectedTrip(null)
+          fetchMyTrips()
         }}
       />
-
       <TripBookingsModal
         isOpen={showBookingsModal}
         trip={selectedTrip}
-        onClose={() => {
-          setShowBookingsModal(false)
-          setSelectedTrip(null)
-        }}
+        onClose={() => setShowBookingsModal(false)}
       />
     </div>
   )

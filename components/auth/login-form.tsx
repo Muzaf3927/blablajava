@@ -48,9 +48,9 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToReset }: Login
       
       // Проверяем что пользователь действительно аутентифицирован
       if (response?.access_token) {
-        console.log('=== LOGIN FORM: Access token found, redirecting to /trips')
+        console.log('=== LOGIN FORM: Access token found, redirecting to /my-trips')
         // Используем Next.js router для редиректа
-        router.push("/trips")
+        router.push("/my-trips")
       } else {
         console.log('=== LOGIN FORM: No access_token in response')
         setErrors({ general: "Ошибка получения токена доступа" })
