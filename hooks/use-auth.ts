@@ -14,9 +14,13 @@ export function useAuth() {
     const checkAuth = async () => {
       console.log('=== AUTH CHECK START ===')
       console.log('Checking auth on mount...')
+      
+      // Проверяем токен в localStorage напрямую
+      const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+      console.log('Token from localStorage:', localStorageToken ? localStorageToken.substring(0, 20) + '...' : 'null')
+      
       const token = apiClient.getToken()
-      console.log('Token found:', !!token)
-      console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null')
+      console.log('Token from apiClient:', token ? token.substring(0, 20) + '...' : 'null')
       
       if (token) {
         try {

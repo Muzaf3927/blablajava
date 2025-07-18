@@ -11,6 +11,11 @@ export default function TripsPage() {
   const router = useRouter()
   const hasFetched = useRef(false)
 
+  console.log('=== TRIPS PAGE: Component rendered ===')
+  console.log('TripsPage: isAuthenticated =', isAuthenticated)
+  console.log('TripsPage: user =', user)
+  console.log('TripsPage: hasFetched.current =', hasFetched.current)
+
   useEffect(() => {
     console.log('=== TRIPS PAGE: useEffect triggered ===')
     console.log('TripsPage: isAuthenticated =', isAuthenticated)
