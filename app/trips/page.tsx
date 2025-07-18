@@ -21,9 +21,22 @@ export default function TripsPage() {
     console.log('TripsPage: isAuthenticated =', isAuthenticated)
     console.log('TripsPage: user =', user)
     
-    if (!isAuthenticated) {
-      console.log('=== TRIPS PAGE: Not authenticated, redirecting to /')
+    // Проверяем localStorage напрямую
+    const token = localStorage.getItem("auth_token")
+    const userData = localStorage.getItem("user")
+    
+    console.log('TripsPage: Token from localStorage:', !!token)
+    console.log('TripsPage: User data from localStorage:', !!userData)
+    
+    if (!isAuthenticated && (!token || !userData)) {
+      console.log('=== TRIPS PAGE: Not authenticated (no token or user data), redirecting to /')
       router.push("/")
+      return
+    }
+    
+    // Если есть данные в localStorage, но хук еще не обновился, ждем
+    if (!isAuthenticated && token && userData) {
+      console.log('=== TRIPS PAGE: Data in localStorage but hook not updated yet, waiting...')
       return
     }
     
