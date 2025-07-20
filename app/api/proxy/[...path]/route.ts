@@ -43,6 +43,10 @@ async function handleRequest(
   const path = pathSegments.join('/')
   const url = `https://blabla-main.laravel.cloud/api/${path}`
   
+  console.log('=== PROXY: Request method:', method)
+  console.log('=== PROXY: Request path:', path)
+  console.log('=== PROXY: Full URL:', url)
+  
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   }
@@ -51,18 +55,27 @@ async function handleRequest(
   const authHeader = request.headers.get('authorization')
   if (authHeader) {
     headers['Authorization'] = authHeader
+    console.log('=== PROXY: Authorization header present')
+  } else {
+    console.log('=== PROXY: No Authorization header')
   }
 
   const body = method !== 'GET' ? await request.text() : undefined
+  console.log('=== PROXY: Request body:', body)
 
   try {
+    console.log('=== PROXY: Making request to backend...')
     const response = await fetch(url, {
       method,
       headers,
       body,
     })
 
+    console.log('=== PROXY: Backend response status:', response.status)
+    console.log('=== PROXY: Backend response headers:', Object.fromEntries(response.headers.entries()))
+
     const data = await response.json()
+    console.log('=== PROXY: Backend response data:', data)
 
     return NextResponse.json(data, {
       status: response.status,
@@ -71,7 +84,7 @@ async function handleRequest(
       },
     })
   } catch (error) {
-    console.error('Proxy error:', error)
+    console.error('=== PROXY: Error occurred:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

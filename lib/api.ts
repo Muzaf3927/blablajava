@@ -59,23 +59,28 @@ class ApiClient {
     };
 
     try {
-      console.log('API: Making request to:', url)
-      console.log('API: Request config:', config)
+      console.log('=== API: Making request to:', url)
+      console.log('=== API: Request method:', config.method || 'GET')
+      console.log('=== API: Request headers:', config.headers)
+      console.log('=== API: Request body:', config.body)
       
       const response = await fetch(url, config);
-      const data = await response.json();
+      console.log('=== API: Response status:', response.status)
+      console.log('=== API: Response headers:', Object.fromEntries(response.headers.entries()))
       
-      console.log('API: Response status:', response.status)
-      console.log('API: Response data:', data)
+      const data = await response.json();
+      console.log('=== API: Response data:', data)
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        console.error('=== API: Request failed with status:', response.status)
+        console.error('=== API: Error data:', data)
+        throw new Error(data.message || data.error || `HTTP error! status: ${response.status}`);
       }
 
       // Laravel возвращает данные напрямую, а не в data поле
       return data;
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error('=== API: Request failed with error:', error);
       throw error;
     }
   }
@@ -206,7 +211,10 @@ class ApiClient {
   }
 
   async getTripBookings(tripId: number) {
-    return this.request<{ bookings: Booking[] }>(`/trips/${tripId}/bookings`);
+    console.log('=== API: getTripBookings called with tripId:', tripId)
+    const result = await this.request<{ bookings: Booking[] }>(`/trips/${tripId}/bookings`);
+    console.log('=== API: getTripBookings result:', result)
+    return result;
   }
 
   async cancelBooking(bookingId: number) {
