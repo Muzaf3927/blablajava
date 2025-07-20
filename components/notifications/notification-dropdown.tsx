@@ -5,31 +5,31 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Bell } from "lucide-react"
-import { useNotifications } from "@/hooks/use-notifications"
-import { useRouter } from "next/navigation"
 
 export default function NotificationDropdown() {
-  const { notifications, unreadCount, fetchNotifications, markAsRead } = useNotifications()
-  const router = useRouter()
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
-    fetchNotifications()
-  }, [fetchNotifications])
-
-  const handleNotificationClick = async (notification: any) => {
-    if (!notification.is_read) {
-      await markAsRead(notification.id)
-    }
-
-    // Навигация в зависимости от типа уведомления
-    if (notification.type === "booking") {
-      router.push("/my-trips")
-    } else if (notification.type === "trip") {
-      router.push("/my-trips")
-    } else if (notification.type === "message") {
-      router.push("/chats")
-    }
-  }
+    // Демо уведомления
+    setNotifications([
+      {
+        id: 1,
+        title: "Новое бронирование",
+        message: "Пользователь забронировал место в вашей поездке",
+        read: false,
+        created_at: "2024-01-15T10:00:00Z",
+      },
+      {
+        id: 2,
+        title: "Подтверждение поездки",
+        message: "Ваша поездка была подтверждена",
+        read: true,
+        created_at: "2024-01-14T15:30:00Z",
+      },
+    ])
+    setUnreadCount(1)
+  }, [])
 
   return (
       <DropdownMenu>
@@ -56,8 +56,7 @@ export default function NotificationDropdown() {
                   {notifications.map((notification) => (
                       <DropdownMenuItem 
                         key={notification.id} 
-                        className="flex-col items-start p-3 cursor-pointer"
-                        onClick={() => handleNotificationClick(notification)}
+                        className="flex-col items-start p-3"
                       >
                         <div className="flex justify-between items-start w-full">
                           <div className="flex-1">
@@ -67,7 +66,7 @@ export default function NotificationDropdown() {
                               {new Date(notification.created_at).toLocaleDateString("ru-RU")}
                             </p>
                           </div>
-                          {!notification.is_read && <div className="w-2 h-2 bg-blue-600 rounded-full ml-2 mt-1" />}
+                          {!notification.read && <div className="w-2 h-2 bg-blue-600 rounded-full ml-2 mt-1" />}
                         </div>
                       </DropdownMenuItem>
                   ))}

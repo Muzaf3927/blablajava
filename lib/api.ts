@@ -252,18 +252,7 @@ class ApiClient {
     });
   }
 
-  async createNotification(notificationData: { 
-    user_id: number; 
-    title: string; 
-    message: string; 
-    type: string; 
-    data?: any 
-  }) {
-    return this.request<Notification>('/notifications', {
-      method: 'POST',
-      body: JSON.stringify(notificationData),
-    });
-  }
+
 
   // Wallet endpoints
   async getWallet() {

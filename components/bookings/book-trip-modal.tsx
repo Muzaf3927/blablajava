@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, Clock, Users, Car, Star, Wallet } from "lucide-react"
 import { useBookings } from "@/hooks/use-bookings"
-import { apiClient } from "@/lib/api"
 
 interface BookTripModalProps {
   isOpen: boolean
@@ -40,27 +39,7 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
     }
 
     try {
-      const booking = await createBooking(trip.id, seats)
-      
-      // Создаем уведомление для владельца поездки
-      try {
-        await apiClient.createNotification({
-          user_id: trip.user_id,
-          title: "Новый запрос на бронирование",
-          message: `Пользователь хочет забронировать ${seats} ${seats === 1 ? 'место' : 'места'} в вашей поездке ${trip.from_city} → ${trip.to_city}`,
-          type: "booking",
-          data: JSON.stringify({
-            booking_id: booking.id,
-            trip_id: trip.id,
-            user_id: booking.user_id,
-            seats: seats
-          })
-        })
-      } catch (notificationError) {
-        console.error("Error creating notification:", notificationError)
-        // Не прерываем основной поток, если уведомление не создалось
-      }
-      
+      await createBooking(trip.id, seats)
       onSuccess()
     } catch (error: any) {
       setErrors({ general: error.message || "Ошибка бронирования" })
