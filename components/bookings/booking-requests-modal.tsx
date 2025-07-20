@@ -35,12 +35,14 @@ export default function BookingRequestsModal({
   }, [isOpen, trip.id])
 
   const loadPendingBookings = async () => {
+    if (!trip?.id) return
+    
     setIsLoading(true)
     try {
       const response = await fetchTripBookings(trip.id)
-      const pending = response.bookings.filter((booking: Booking) => 
-        booking.status === 'pending'
-      )
+      const pending = response.bookings?.filter((booking: Booking) => 
+        booking?.status === 'pending'
+      ) || []
       setPendingBookings(pending)
     } catch (error) {
       console.error("Error loading pending bookings:", error)
@@ -104,21 +106,21 @@ export default function BookingRequestsModal({
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-blue-500" />
                 <span className="font-medium text-gray-900">
-                  {trip.from_city} → {trip.to_city}
+                  {trip?.from_city || ''} → {trip?.to_city || ''}
                 </span>
               </div>
               <div className="flex items-center space-x-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-4 h-4" />
-                  <span>{new Date(trip.date).toLocaleDateString("ru-RU")}</span>
+                  <span>{trip?.date ? new Date(trip.date).toLocaleDateString("ru-RU") : ''}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="w-4 h-4" />
-                  <span>{trip.time}</span>
+                  <span>{trip?.time || ''}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Users className="w-4 h-4" />
-                  <span>{trip.seats} мест</span>
+                  <span>{trip?.seats || 0} мест</span>
                 </div>
               </div>
             </div>
@@ -168,9 +170,9 @@ export default function BookingRequestsModal({
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-semibold text-gray-900">
-                        {trip.price * booking.seats} ₽
-                      </div>
+                                             <div className="font-semibold text-gray-900">
+                         {(trip?.price || 0) * (booking?.seats || 0)} ₽
+                       </div>
                       <div className="text-sm text-gray-500">
                         {new Date(booking.created_at).toLocaleDateString("ru-RU")}
                       </div>

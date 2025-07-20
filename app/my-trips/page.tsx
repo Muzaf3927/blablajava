@@ -64,8 +64,8 @@ export default function MyTripsPage() {
     setShowRequestsModal(true)
   }
 
-  const activeTrips = myTrips.filter((trip) => trip.status === "active")
-  const completedTrips = myTrips.filter((trip) => trip.status === "completed")
+  const activeTrips = myTrips?.filter((trip) => trip?.status === "active") || []
+  const completedTrips = myTrips?.filter((trip) => trip?.status === "completed") || []
 
   if (isLoading) {
     return (
@@ -78,23 +78,29 @@ export default function MyTripsPage() {
     )
   }
 
-  const TripCard = ({ trip }: { trip: any }) => (
-    <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-      <CardContent className="p-6">
-        {/* Route */}
-        <div className="flex items-center space-x-2 mb-4">
-          <div className="flex-1">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="font-medium text-gray-900">{trip.from_city}</span>
+  const TripCard = ({ trip }: { trip: any }) => {
+    // Проверяем, что trip существует и имеет необходимые поля
+    if (!trip || !trip.from_city || !trip.to_city) {
+      return null
+    }
+
+    return (
+      <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+        <CardContent className="p-6">
+          {/* Route */}
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="font-medium text-gray-900">{trip.from_city}</span>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="font-medium text-gray-900">{trip.to_city}</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2 mt-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="font-medium text-gray-900">{trip.to_city}</span>
-            </div>
+            <MapPin className="w-5 h-5 text-gray-400" />
           </div>
-          <MapPin className="w-5 h-5 text-gray-400" />
-        </div>
 
         {/* Date & Time */}
         <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
@@ -176,7 +182,8 @@ export default function MyTripsPage() {
         </div>
       </CardContent>
     </Card>
-  )
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -184,7 +191,7 @@ export default function MyTripsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать, {user?.name}!</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать, {user?.name || 'Пользователь'}!</h1>
             <p className="text-gray-600">Управляйте своими поездками и найдите попутчиков</p>
           </div>
           <Button 
@@ -326,38 +333,46 @@ export default function MyTripsPage() {
 
       {/* Modals */}
       <CreateTripModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
-      <EditTripModal
-        isOpen={showEditModal}
-        trip={selectedTrip}
-        onClose={() => setShowEditModal(false)}
-        onSuccess={() => {
-          setShowEditModal(false)
-          fetchMyTrips()
-        }}
-      />
-      <DeleteTripModal
-        isOpen={showDeleteModal}
-        trip={selectedTrip}
-        onClose={() => setShowDeleteModal(false)}
-        onSuccess={() => {
-          setShowDeleteModal(false)
-          fetchMyTrips()
-        }}
-      />
-      <TripBookingsModal
-        isOpen={showBookingsModal}
-        trip={selectedTrip}
-        onClose={() => setShowBookingsModal(false)}
-      />
-      <BookingRequestsModal
-        isOpen={showRequestsModal}
-        trip={selectedTrip}
-        onClose={() => setShowRequestsModal(false)}
-        onUpdate={() => {
-          setShowRequestsModal(false)
-          fetchMyTrips()
-        }}
-      />
+      {selectedTrip && (
+        <EditTripModal
+          isOpen={showEditModal}
+          trip={selectedTrip}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={() => {
+            setShowEditModal(false)
+            fetchMyTrips()
+          }}
+        />
+      )}
+      {selectedTrip && (
+        <DeleteTripModal
+          isOpen={showDeleteModal}
+          trip={selectedTrip}
+          onClose={() => setShowDeleteModal(false)}
+          onSuccess={() => {
+            setShowDeleteModal(false)
+            fetchMyTrips()
+          }}
+        />
+      )}
+      {selectedTrip && (
+        <TripBookingsModal
+          isOpen={showBookingsModal}
+          trip={selectedTrip}
+          onClose={() => setShowBookingsModal(false)}
+        />
+      )}
+      {selectedTrip && (
+        <BookingRequestsModal
+          isOpen={showRequestsModal}
+          trip={selectedTrip}
+          onClose={() => setShowRequestsModal(false)}
+          onUpdate={() => {
+            setShowRequestsModal(false)
+            fetchMyTrips()
+          }}
+        />
+      )}
     </div>
   )
 }
