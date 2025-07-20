@@ -56,7 +56,7 @@ export function useBookings() {
       console.log('=== BOOKINGS: Fetching trip bookings ===', tripId)
       const response = await apiClient.getTripBookings(tripId)
       console.log('=== BOOKINGS: Trip bookings response ===', response)
-      return { bookings: response || [] }
+      return { bookings: response?.bookings || [] }
     } catch (err) {
       console.error('=== BOOKINGS: Error fetching trip bookings ===', err)
       setError(err instanceof Error ? err.message : "Ошибка загрузки бронирований поездки")

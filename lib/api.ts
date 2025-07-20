@@ -206,7 +206,7 @@ class ApiClient {
   }
 
   async getTripBookings(tripId: number) {
-    return this.request<Booking[]>(`/trips/${tripId}/bookings`);
+    return this.request<{ bookings: Booking[] }>(`/trips/${tripId}/bookings`);
   }
 
   async cancelBooking(bookingId: number) {
