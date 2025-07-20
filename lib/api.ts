@@ -195,14 +195,16 @@ class ApiClient {
   }
 
   async approveBooking(bookingId: number) {
-    return this.request<Booking>(`/bookings/${bookingId}/approve`, {
+    return this.request<{ message: string; status: string }>(`/bookings/${bookingId}`, {
       method: 'PATCH',
+      body: JSON.stringify({ status: 'confirmed' }),
     });
   }
 
   async rejectBooking(bookingId: number) {
-    return this.request<Booking>(`/bookings/${bookingId}/reject`, {
+    return this.request<{ message: string; status: string }>(`/bookings/${bookingId}`, {
       method: 'PATCH',
+      body: JSON.stringify({ status: 'declined' }),
     });
   }
 
@@ -211,10 +213,7 @@ class ApiClient {
   }
 
   async getTripBookings(tripId: number) {
-    console.log('=== API: getTripBookings called with tripId:', tripId)
-    const result = await this.request<{ bookings: Booking[] }>(`/trips/${tripId}/bookings`);
-    console.log('=== API: getTripBookings result:', result)
-    return result;
+    return this.request<{ bookings: Booking[] }>(`/trips/${tripId}/bookings`);
   }
 
   async cancelBooking(bookingId: number) {

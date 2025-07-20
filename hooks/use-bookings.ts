@@ -98,9 +98,9 @@ export function useBookings() {
       const response = await apiClient.approveBooking(bookingId)
       console.log('=== BOOKINGS: Approve booking response ===', response)
       
-      // Обновляем бронирование в списке
+      // Обновляем бронирование в списке - backend возвращает { message, status }
       setBookings((prev: Booking[]) => prev.map((booking: Booking) => 
-        booking.id === bookingId ? response : booking
+        booking.id === bookingId ? { ...booking, status: response.status } : booking
       ))
       
       console.log('=== BOOKINGS: Booking approved successfully ===')
@@ -122,9 +122,9 @@ export function useBookings() {
       const response = await apiClient.rejectBooking(bookingId)
       console.log('=== BOOKINGS: Reject booking response ===', response)
       
-      // Обновляем бронирование в списке
+      // Обновляем бронирование в списке - backend возвращает { message, status }
       setBookings((prev: Booking[]) => prev.map((booking: Booking) => 
-        booking.id === bookingId ? response : booking
+        booking.id === bookingId ? { ...booking, status: response.status } : booking
       ))
       
       console.log('=== BOOKINGS: Booking rejected successfully ===')
