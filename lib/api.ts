@@ -189,6 +189,18 @@ class ApiClient {
     });
   }
 
+  async approveBooking(bookingId: number) {
+    return this.request<Booking>(`/bookings/${bookingId}/approve`, {
+      method: 'PATCH',
+    });
+  }
+
+  async rejectBooking(bookingId: number) {
+    return this.request<Booking>(`/bookings/${bookingId}/reject`, {
+      method: 'PATCH',
+    });
+  }
+
   async getMyBookings() {
     return this.request<Booking[]>('/bookings');
   }
@@ -237,6 +249,19 @@ class ApiClient {
   async markAllNotificationsAsRead() {
     return this.request('/notifications/read-all', {
       method: 'PATCH',
+    });
+  }
+
+  async createNotification(notificationData: { 
+    user_id: number; 
+    title: string; 
+    message: string; 
+    type: string; 
+    data?: any 
+  }) {
+    return this.request<Notification>('/notifications', {
+      method: 'POST',
+      body: JSON.stringify(notificationData),
     });
   }
 

@@ -90,6 +90,54 @@ export function useBookings() {
     }
   }
 
+  const approveBooking = async (bookingId: number) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      console.log('=== BOOKINGS: Approving booking ===', bookingId)
+      const response = await apiClient.approveBooking(bookingId)
+      console.log('=== BOOKINGS: Approve booking response ===', response)
+      
+      // Обновляем бронирование в списке
+      setBookings((prev: Booking[]) => prev.map((booking: Booking) => 
+        booking.id === bookingId ? response : booking
+      ))
+      
+      console.log('=== BOOKINGS: Booking approved successfully ===')
+      return response
+    } catch (err) {
+      console.error('=== BOOKINGS: Error approving booking ===', err)
+      setError(err instanceof Error ? err.message : "Ошибка подтверждения бронирования")
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const rejectBooking = async (bookingId: number) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      console.log('=== BOOKINGS: Rejecting booking ===', bookingId)
+      const response = await apiClient.rejectBooking(bookingId)
+      console.log('=== BOOKINGS: Reject booking response ===', response)
+      
+      // Обновляем бронирование в списке
+      setBookings((prev: Booking[]) => prev.map((booking: Booking) => 
+        booking.id === bookingId ? response : booking
+      ))
+      
+      console.log('=== BOOKINGS: Booking rejected successfully ===')
+      return response
+    } catch (err) {
+      console.error('=== BOOKINGS: Error rejecting booking ===', err)
+      setError(err instanceof Error ? err.message : "Ошибка отклонения бронирования")
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const cancelBooking = async (bookingId: number) => {
     setIsLoading(true)
     setError(null)
@@ -122,6 +170,8 @@ export function useBookings() {
     createBooking,
     fetchTripBookings,
     updateBookingStatus,
+    approveBooking,
+    rejectBooking,
     cancelBooking,
   }
 }

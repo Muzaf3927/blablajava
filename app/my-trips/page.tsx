@@ -11,6 +11,7 @@ import { CreateTripModal } from "@/components/trips/create-trip-modal"
 import EditTripModal from "@/components/trips/edit-trip-modal"
 import DeleteTripModal from "@/components/trips/delete-trip-modal"
 import TripBookingsModal from "@/components/bookings/trip-bookings-modal"
+import BookingRequestsModal from "@/components/bookings/booking-requests-modal"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
 
@@ -19,6 +20,7 @@ export default function MyTripsPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showBookingsModal, setShowBookingsModal] = useState(false)
+  const [showRequestsModal, setShowRequestsModal] = useState(false)
   const [selectedTrip, setSelectedTrip] = useState<any>(null)
   const hasFetched = useRef(false)
 
@@ -55,6 +57,11 @@ export default function MyTripsPage() {
   const handleViewBookings = (trip: any) => {
     setSelectedTrip(trip)
     setShowBookingsModal(true)
+  }
+
+  const handleViewRequests = (trip: any) => {
+    setSelectedTrip(trip)
+    setShowRequestsModal(true)
   }
 
   const activeTrips = myTrips.filter((trip) => trip.status === "active")
@@ -142,6 +149,10 @@ export default function MyTripsPage() {
           </Badge>
 
           <div className="flex space-x-2">
+            <Button onClick={() => handleViewRequests(trip)} size="sm" variant="outline" className="bg-white/80">
+              <MessageCircle className="w-4 h-4 mr-1" />
+              Запросы
+            </Button>
             <Button onClick={() => handleViewBookings(trip)} size="sm" variant="outline" className="bg-white/80">
               <MessageCircle className="w-4 h-4 mr-1" />
               Бронирования
@@ -337,6 +348,15 @@ export default function MyTripsPage() {
         isOpen={showBookingsModal}
         trip={selectedTrip}
         onClose={() => setShowBookingsModal(false)}
+      />
+      <BookingRequestsModal
+        isOpen={showRequestsModal}
+        trip={selectedTrip}
+        onClose={() => setShowRequestsModal(false)}
+        onUpdate={() => {
+          setShowRequestsModal(false)
+          fetchMyTrips()
+        }}
       />
     </div>
   )
