@@ -7,15 +7,16 @@ import { Badge } from "@/components/ui/badge"
 import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, CreditCard, History, TrendingUp } from "lucide-react"
 import DepositModal from "@/components/wallet/deposit-modal"
 import { useWallet } from "@/hooks/use-wallet"
+import { formatNumber, formatDate } from "@/lib/utils"
 
 export default function WalletPage() {
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [filter, setFilter] = useState<"all" | "deposit" | "withdrawal">("all")
-  const { balance, transactions, loading, fetchWallet, fetchTransactions } = useWallet()
+  const { wallet, transactions, isLoading, getWallet, getTransactions } = useWallet()
 
   useEffect(() => {
-    fetchWallet()
-    fetchTransactions()
+    getWallet()
+    getTransactions()
   }, [])
 
   const filteredTransactions = transactions.filter((transaction) => {
@@ -62,7 +63,7 @@ export default function WalletPage() {
     }
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -100,7 +101,9 @@ export default function WalletPage() {
 
               <CardContent className="relative z-10 space-y-6">
                 <div>
-                  <div className="text-4xl font-bold text-white mb-2">{balance.toLocaleString("ru-RU")} ₽</div>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {formatNumber(wallet?.balance || 0)} сум
+                  </div>
                   <div className="text-white/70 text-sm">Доступно для использования</div>
                 </div>
 
@@ -226,7 +229,7 @@ export default function WalletPage() {
                             {transaction.description || getTransactionText(transaction.type)}
                           </div>
                           <div className="text-sm text-gray-600">
-                            {new Date(transaction.created_at).toLocaleString("ru-RU")}
+                            {formatDate(transaction.created_at)}
                           </div>
                         </div>
                       </div>
@@ -234,7 +237,7 @@ export default function WalletPage() {
                       <div className="text-right">
                         <div className={`text-lg font-bold ${getTransactionColor(transaction.type)}`}>
                           {transaction.type === "deposit" ? "+" : "-"}
-                          {transaction.amount.toLocaleString("ru-RU")} ₽
+                          {formatNumber(transaction.amount)} сум
                         </div>
                         <Badge
                           className={`${
@@ -261,8 +264,8 @@ export default function WalletPage() {
           isOpen={showDepositModal}
           onClose={() => setShowDepositModal(false)}
           onSuccess={() => {
-            fetchWallet()
-            fetchTransactions()
+            getWallet()
+            getTransactions()
             setShowDepositModal(false)
           }}
         />

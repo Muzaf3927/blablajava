@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { useWallet } from "@/hooks/use-wallet"
+import { formatNumber, formatDate } from "@/lib/utils"
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
@@ -215,11 +216,11 @@ export default function DashboardPage() {
                     <div className="text-right">
                       <div className="flex items-center space-x-1">
                         <Clock className="w-3 h-3 text-gray-500" />
-                        <span className="text-sm text-gray-600">
-                          {new Date(trip.date).toLocaleDateString("ru-RU")} в {trip.time}
-                        </span>
+                                                 <span className="text-sm text-gray-600">
+                           {formatDate(trip.date, "ru-RU").split(',')[0]} в {trip.time}
+                         </span>
                       </div>
-                      <div className="font-semibold text-green-600">{trip.price} сум</div>
+                                             <div className="font-semibold text-green-600">{formatNumber(trip.price)} сум</div>
                     </div>
                     <Badge 
                       variant={trip.status === "completed" ? "secondary" : "default"}
