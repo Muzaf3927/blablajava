@@ -27,7 +27,7 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
     to_city: "",
     date: "",
     time: "",
-    price: 0,
+    price: null,
     seats: 1,
     note: "",
     carModel: "",
@@ -36,6 +36,22 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
   })
 
   const { createTrip, isLoading } = useTrips()
+
+  const handlePriceChange = (value: number | null) => {
+    setFormData({ ...formData, price: value })
+  }
+
+  const increasePrice = () => {
+    const currentPrice = formData.price || 0
+    handlePriceChange(currentPrice + 5000)
+  }
+
+  const decreasePrice = () => {
+    const currentPrice = formData.price || 0
+    if (currentPrice >= 5000) {
+      handlePriceChange(currentPrice - 5000)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +65,7 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
         to_city: "",
         date: "",
         time: "",
-        price: 0,
+        price: null,
         seats: 1,
         note: "",
         carModel: "",
@@ -124,17 +140,39 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="price" className="text-right">
-                Цена
+                Цена (сум)
               </Label>
-              <Input
-                id="price"
-                type="number"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                className="col-span-3"
-                min="0"
-                required
-              />
+              <div className="col-span-3 flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={decreasePrice}
+                  className="px-2"
+                >
+                  -
+                </Button>
+                <Input
+                  id="price"
+                  type="number"
+                  value={formData.price || ""}
+                  onChange={(e) => handlePriceChange(Number(e.target.value) || null)}
+                  className="flex-1"
+                  min="0"
+                  step="5000"
+                  placeholder="Введите цену"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={increasePrice}
+                  className="px-2"
+                >
+                  +
+                </Button>
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="seats" className="text-right">
@@ -147,6 +185,7 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
                 onChange={(e) => setFormData({ ...formData, seats: Number(e.target.value) })}
                 className="col-span-3"
                 min="1"
+                max="7"
                 required
               />
             </div>

@@ -149,7 +149,7 @@ export interface TripForm {
   to_city: string;
   date: string;
   time: string;
-  price: number;
+  price: number | null;
   seats: number;
   note?: string;
   carModel?: string;

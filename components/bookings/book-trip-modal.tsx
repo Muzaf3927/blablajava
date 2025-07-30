@@ -31,6 +31,7 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
     // Validation
     const newErrors: Record<string, string> = {}
     if (seats < 1) newErrors.seats = "Минимум 1 место"
+    if (seats > 7) newErrors.seats = "Максимум 7 мест"
     if (seats > trip.seats) newErrors.seats = `Максимум ${trip.seats} мест`
 
     if (Object.keys(newErrors).length > 0) {
@@ -157,7 +158,7 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
                   id="seats"
                   type="number"
                   min="1"
-                  max={trip.seats}
+                  max={Math.min(7, trip.seats)}
                   value={seats}
                   onChange={(e) => setSeats(Number.parseInt(e.target.value) || 1)}
                   className="w-20 text-center h-12 rounded-xl border-2 border-gray-200 focus:border-blue-500"
@@ -166,8 +167,8 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setSeats(Math.min(trip.seats, seats + 1))}
-                  disabled={seats >= trip.seats}
+                  onClick={() => setSeats(Math.min(Math.min(7, trip.seats), seats + 1))}
+                  disabled={seats >= Math.min(7, trip.seats)}
                   className="w-10 h-10 rounded-full"
                 >
                   +
