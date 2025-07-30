@@ -28,16 +28,8 @@ function HomePageContent() {
       const token = localStorage.getItem("auth_token")
       const userData = localStorage.getItem("user")
 
-      console.log('=== HOME PAGE: Auth check ===')
-      console.log('Token exists:', !!token)
-      console.log('User data exists:', !!userData)
-      console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null')
-
       if (token && userData) {
         setIsAuthenticated(true)
-        console.log('=== HOME PAGE: User authenticated ===')
-      } else {
-        console.log('=== HOME PAGE: User not authenticated ===')
       }
       setLoading(false)
     }

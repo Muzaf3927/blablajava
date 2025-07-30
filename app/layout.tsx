@@ -2,6 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import Navigation from "@/components/layout/navigation"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] })
 
@@ -17,7 +19,12 @@ export default function RootLayout({
 }) {
     return (
         <html lang="ru">
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+            <ThemeProvider>
+                <Navigation />
+                <main>{children}</main>
+            </ThemeProvider>
+        </body>
         </html>
     )
 }

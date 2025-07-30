@@ -19,17 +19,9 @@ import { useAuth } from "@/hooks/use-auth"
 import { Car, Calendar, MessageCircle, Wallet, Star, Settings, User, LogOut, Menu, X, TrendingUp } from "lucide-react"
 
 export default function Navigation() {
-  const [user, setUser] = useState<any>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { logout } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
   const router = useRouter()
-
-  useEffect(() => {
-    const userData = localStorage.getItem("user")
-    if (userData) {
-      setUser(JSON.parse(userData))
-    }
-  }, [])
 
   const handleLogout = async () => {
     await logout()
@@ -46,8 +38,35 @@ export default function Navigation() {
     { href: "/ratings", label: "Отзывы", icon: Star },
   ]
 
-  if (!user) {
-    return null
+  // Простая навигация для неавторизованных пользователей
+  if (!isAuthenticated || !user) {
+    return (
+      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center h-16">
+            {/* Логотип */}
+            <div className="flex items-center space-x-4">
+              <a href="/" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <Car className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold text-gray-900">RideShare</span>
+              </a>
+            </div>
+
+            {/* Кнопка входа */}
+            <div className="flex items-center space-x-4">
+              <a 
+                href="/" 
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Войти
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    )
   }
 
   return (

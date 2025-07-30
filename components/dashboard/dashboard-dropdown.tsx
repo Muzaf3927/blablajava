@@ -81,7 +81,7 @@ export function DashboardDropdown({ user }: DashboardDropdownProps) {
     {
       title: "Забронированные поездки",
       icon: Calendar,
-      count: 3, // TODO: Получить из API
+      count: 0,
       href: "/bookings",
       color: "bg-gradient-to-r from-blue-500 to-purple-600",
       textColor: "text-white"
@@ -89,7 +89,7 @@ export function DashboardDropdown({ user }: DashboardDropdownProps) {
     {
       title: "Чаты",
       icon: MessageCircle,
-      count: 5, // TODO: Получить из API
+      count: 0,
       href: "/chats",
       color: "bg-gradient-to-r from-purple-500 to-pink-600",
       textColor: "text-white"
@@ -97,7 +97,7 @@ export function DashboardDropdown({ user }: DashboardDropdownProps) {
     {
       title: "История поездок",
       icon: History,
-      count: 12, // TODO: Получить из API
+      count: 0,
       href: "/my-trips",
       color: "bg-gradient-to-r from-orange-500 to-red-600",
       textColor: "text-white"

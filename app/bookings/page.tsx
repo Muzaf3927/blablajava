@@ -47,10 +47,7 @@ export default function BookingsPage() {
   const fetchBookings = async () => {
     setLoading(true)
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Mock data
+      // TODO: Заменить на реальный API вызов
       const mockBookings: Booking[] = []
       setBookings(mockBookings)
     } catch (error) {

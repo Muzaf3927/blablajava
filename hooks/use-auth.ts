@@ -19,8 +19,7 @@ export function useAuth() {
       const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
       console.log('Token from localStorage:', localStorageToken ? localStorageToken.substring(0, 20) + '...' : 'null')
       
-      const token = apiClient.getToken()
-      console.log('Token from apiClient:', token ? token.substring(0, 20) + '...' : 'null')
+          const token = apiClient.getToken()
       
       if (token) {
         try {

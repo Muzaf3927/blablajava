@@ -23,41 +23,25 @@ export default function TripsPage() {
   const [selectedTrip, setSelectedTrip] = useState<any>(null)
   const [showBookModal, setShowBookModal] = useState(false)
 
-  console.log('=== TRIPS PAGE: Component rendered ===')
-  console.log('TripsPage: isAuthenticated =', isAuthenticated)
-  console.log('TripsPage: user =', user)
-  console.log('TripsPage: hasFetched.current =', hasFetched.current)
-  console.log('TripsPage: isLoading =', isLoading)
-  console.log('TripsPage: trips =', trips)
-  console.log('TripsPage: trips.length =', trips.length)
+
 
   useEffect(() => {
-    console.log('=== TRIPS PAGE: useEffect triggered ===')
-    console.log('TripsPage: isAuthenticated =', isAuthenticated)
-    console.log('TripsPage: user =', user)
-    
     // Проверяем localStorage напрямую
     const token = localStorage.getItem("auth_token")
     const userData = localStorage.getItem("user")
     
-    console.log('TripsPage: Token from localStorage:', !!token)
-    console.log('TripsPage: User data from localStorage:', !!userData)
-    
     if (!isAuthenticated && (!token || !userData)) {
-      console.log('=== TRIPS PAGE: Not authenticated (no token or user data), redirecting to /')
       router.push("/")
       return
     }
     
     // Если есть данные в localStorage, но хук еще не обновился, ждем
     if (!isAuthenticated && token && userData) {
-      console.log('=== TRIPS PAGE: Data in localStorage but hook not updated yet, waiting...')
       return
     }
     
     // Загружаем поездки только один раз при первой аутентификации
     if (isAuthenticated && !hasFetched.current) {
-      console.log('=== TRIPS PAGE: Authenticated, fetching trips (first time)')
       hasFetched.current = true
       fetchAllTrips()
     }

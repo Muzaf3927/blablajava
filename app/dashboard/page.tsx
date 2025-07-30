@@ -47,7 +47,7 @@ export default function DashboardPage() {
     },
     {
       title: "Активные брони",
-      value: "3",
+      value: "0",
       icon: Calendar,
       color: "bg-gradient-to-r from-blue-500 to-purple-600",
       textColor: "text-white",
@@ -56,7 +56,7 @@ export default function DashboardPage() {
     },
     {
       title: "Новые сообщения",
-      value: "5",
+      value: "0",
       icon: MessageCircle,
       color: "bg-gradient-to-r from-purple-500 to-pink-600",
       textColor: "text-white",
@@ -65,7 +65,7 @@ export default function DashboardPage() {
     },
     {
       title: "Завершенные поездки",
-      value: "12",
+      value: "0",
       icon: History,
       color: "bg-gradient-to-r from-orange-500 to-red-600",
       textColor: "text-white",
@@ -74,26 +74,7 @@ export default function DashboardPage() {
     }
   ]
 
-  const recentTrips = [
-    {
-      id: 1,
-      from: "Ташкент",
-      to: "Самарканд",
-      date: "2024-01-15",
-      time: "08:00",
-      price: 50000,
-      status: "completed"
-    },
-    {
-      id: 2,
-      from: "Ташкент",
-      to: "Бухара",
-      date: "2024-01-20",
-      time: "10:00",
-      price: 75000,
-      status: "active"
-    }
-  ]
+  const recentTrips: any[] = []
 
   if (!user) {
     return (

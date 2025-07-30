@@ -59,28 +59,16 @@ class ApiClient {
     };
 
     try {
-      console.log('=== API: Making request to:', url)
-      console.log('=== API: Request method:', config.method || 'GET')
-      console.log('=== API: Request headers:', config.headers)
-      console.log('=== API: Request body:', config.body)
-      
       const response = await fetch(url, config);
-      console.log('=== API: Response status:', response.status)
-      console.log('=== API: Response headers:', Object.fromEntries(response.headers.entries()))
-      
       const data = await response.json();
-      console.log('=== API: Response data:', data)
 
       if (!response.ok) {
-        console.error('=== API: Request failed with status:', response.status)
-        console.error('=== API: Error data:', data)
         throw new Error(data.message || data.error || `HTTP error! status: ${response.status}`);
       }
 
       // Laravel возвращает данные напрямую, а не в data поле
       return data;
     } catch (error) {
-      console.error('=== API: Request failed with error:', error);
       throw error;
     }
   }
@@ -94,20 +82,14 @@ class ApiClient {
   }
 
   async login(credentials: LoginForm): Promise<AuthResponse> {
-    console.log('API: Sending login request with:', credentials)
     const response = await this.request<AuthResponse>('/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
     
-    console.log('API: Login response received:', response)
-    
     // Laravel возвращает данные напрямую
     if (response?.access_token) {
       this.setToken(response.access_token);
-      console.log('API: Token saved successfully')
-    } else {
-      console.log('API: No access_token in response')
     }
     
     return response;
@@ -130,9 +112,7 @@ class ApiClient {
 
   // User endpoints
   async getCurrentUser(): Promise<User> {
-    console.log('API: Getting current user...')
     const response = await this.request<User>('/user');
-    console.log('API: Current user response:', response)
     return response;
   }
 
