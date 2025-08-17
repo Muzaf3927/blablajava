@@ -27,8 +27,8 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
     to_city: "",
     date: "",
     time: "",
-    price: 0,
-    seats: 1,
+    price: undefined as any,
+    seats: undefined as any,
     note: "",
     carModel: "",
     carColor: "",
@@ -38,16 +38,16 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
   const { createTrip, isLoading } = useTrips()
 
   const handlePriceChange = (value: number) => {
-    setFormData({ ...formData, price: value })
+    setFormData({ ...formData, price: value || undefined })
   }
 
   const increasePrice = () => {
-    const currentPrice = formData.price
+    const currentPrice = formData.price || 0
     handlePriceChange(currentPrice + 5000)
   }
 
   const decreasePrice = () => {
-    const currentPrice = formData.price
+    const currentPrice = formData.price || 0
     if (currentPrice >= 5000) {
       handlePriceChange(currentPrice - 5000)
     }
@@ -57,8 +57,8 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
     e.preventDefault()
     
     // Валидация
-    if (!formData.from_city || !formData.to_city || !formData.date || !formData.time || formData.price <= 0) {
-      alert("Пожалуйста, заполните все обязательные поля и укажите цену больше 0")
+    if (!formData.from_city || !formData.to_city || !formData.date || !formData.time || !formData.price || formData.price <= 0 || !formData.seats || formData.seats < 1) {
+      alert("Пожалуйста, заполните все обязательные поля, укажите цену больше 0 и количество мест от 1 до 7")
       return
     }
     
@@ -71,8 +71,8 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
         to_city: "",
         date: "",
         time: "",
-        price: 0,
-        seats: 1,
+        price: undefined as any,
+        seats: undefined as any,
         note: "",
         carModel: "",
         carColor: "",
@@ -161,7 +161,7 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
                 <Input
                   id="price"
                   type="number"
-                  value={formData.price}
+                  value={formData.price || ""}
                   onChange={(e) => handlePriceChange(Number(e.target.value) || 0)}
                   className="flex-1"
                   min="0"
@@ -187,11 +187,12 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
               <Input
                 id="seats"
                 type="number"
-                value={formData.seats}
+                value={formData.seats || ""}
                 onChange={(e) => setFormData({ ...formData, seats: Number(e.target.value) })}
                 className="col-span-3"
                 min="1"
                 max="7"
+                placeholder="Количество мест"
                 required
               />
             </div>

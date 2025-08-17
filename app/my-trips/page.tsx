@@ -154,7 +154,7 @@ export default function MyTripsPage() {
             {trip.status === "active" ? "Активна" : "Завершена"}
           </Badge>
 
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             <Button onClick={() => handleViewRequests(trip)} size="sm" variant="outline" className="bg-white/80">
               <MessageCircle className="w-4 h-4 mr-1" />
               Запросы

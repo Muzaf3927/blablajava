@@ -154,8 +154,8 @@ export interface TripForm {
   to_city: string;
   date: string;
   time: string;
-  price: number;
-  seats: number;
+  price: number | undefined;
+  seats: number | undefined;
   note?: string;
   carModel?: string;
   carColor?: string;
