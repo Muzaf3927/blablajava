@@ -36,8 +36,8 @@ export default function ChatWindow({ chat, onClose, onMessageSent }: ChatWindowP
   const loadMessages = async () => {
     setLoading(true)
     try {
-      const data = await fetchChatMessages(chat.trip_id, chat.chat_partner_id)
-      setMessages(data.messages || [])
+      const messages = await fetchChatMessages(chat.trip_id, chat.chat_partner_id)
+      setMessages(messages || [])
     } catch (error) {
       console.error("Load messages error:", error)
     } finally {

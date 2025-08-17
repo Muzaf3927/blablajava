@@ -159,6 +159,19 @@ class ApiClient {
     });
   }
 
+  async completeTrip(tripId: number) {
+    return this.request<{ 
+      message: string; 
+      trip: Trip; 
+      driver_fee: number;
+      passenger_fee: number;
+      passengers_count: number;
+      total_passenger_fees: number;
+    }>(`/trips/${tripId}/complete`, {
+      method: 'POST',
+    });
+  }
+
   // Bookings endpoints
   async createBooking(tripId: number, bookingData: BookingForm) {
     return this.request<Booking>(`/trips/${tripId}/booking`, {
@@ -175,14 +188,22 @@ class ApiClient {
   }
 
   async approveBooking(bookingId: number) {
-    return this.request<{ message: string; status: string }>(`/bookings/${bookingId}`, {
+    return this.request<{ 
+      message: string; 
+      status: string; 
+      trip_seats_remaining: number;
+    }>(`/bookings/${bookingId}`, {
       method: 'PATCH',
       body: JSON.stringify({ status: 'confirmed' }),
     });
   }
 
   async rejectBooking(bookingId: number) {
-    return this.request<{ message: string; status: string }>(`/bookings/${bookingId}`, {
+    return this.request<{ 
+      message: string; 
+      status: string; 
+      trip_seats_remaining: number;
+    }>(`/bookings/${bookingId}`, {
       method: 'PATCH',
       body: JSON.stringify({ status: 'declined' }),
     });
@@ -204,22 +225,31 @@ class ApiClient {
 
   // Chat endpoints
   async sendMessage(tripId: number, messageData: MessageForm) {
-    return this.request<Message>(`/chats/${tripId}/send`, {
+    return this.request<{ 
+      status: string; 
+      message: Message; 
+    }>(`/chats/${tripId}/send`, {
       method: 'POST',
       body: JSON.stringify(messageData),
     });
   }
 
   async getChatMessages(tripId: number, receiverId: number) {
-    return this.request<Message[]>(`/chats/${tripId}/with/${receiverId}`);
+    return this.request<{ 
+      status: string; 
+      messages: Message[]; 
+    }>(`/chats/${tripId}/with/${receiverId}`);
   }
 
   async getUserChats() {
-    return this.request<Chat[]>('/chats');
+    return this.request<{ 
+      status: string; 
+      chats: Chat[]; 
+    }>('/chats');
   }
 
   async getUnreadCount() {
-    return this.request<{ count: number }>('/chats/unread-count');
+    return this.request<{ unread_count: number }>('/chats/unread-count');
   }
 
   // Notifications endpoints
@@ -247,30 +277,49 @@ class ApiClient {
   }
 
   async depositWallet(depositData: DepositForm) {
-    return this.request<Transaction>('/wallet/deposit', {
+    return this.request<{ 
+      message: string; 
+      balance: number; 
+    }>('/wallet/deposit', {
       method: 'POST',
       body: JSON.stringify(depositData),
     });
   }
 
   async getWalletTransactions() {
-    return this.request<Transaction[]>('/wallet/transactions');
+    return this.request<{ 
+      transactions: Transaction[]; 
+    }>('/wallet/transactions');
   }
 
   // Ratings endpoints
   async rateUser(tripId: number, toUserId: number, ratingData: RatingForm) {
-    return this.request<Rating>(`/ratings/${tripId}/to/${toUserId}`, {
+    return this.request<{ 
+      message: string; 
+      rating: Rating; 
+    }>(`/ratings/${tripId}/to/${toUserId}`, {
       method: 'POST',
       body: JSON.stringify(ratingData),
     });
   }
 
   async getUserRatings(userId: number) {
-    return this.request<Rating[]>(`/ratings/user/${userId}`);
+    return this.request<{ 
+      average_rating: number; 
+      ratings: { 
+        data: Rating[]; 
+        total: number; 
+      }; 
+    }>(`/ratings/user/${userId}`);
   }
 
   async getMyRatingsGiven() {
-    return this.request<Rating[]>('/ratings/given');
+    return this.request<{ 
+      ratings_given: { 
+        data: Rating[]; 
+        total: number; 
+      }; 
+    }>('/ratings/given');
   }
 
   // Settings endpoints

@@ -2,24 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { apiClient } from "@/lib/api"
-
-interface Wallet {
-  balance: number
-}
-
-interface Transaction {
-  id: number
-  wallet_id: number
-  type: 'deposit' | 'withdrawal' | 'transfer'
-  amount: number
-  description: string
-  created_at: string
-}
-
-interface DepositRequest {
-  amount: number
-  description?: string
-}
+import { Wallet, Transaction, DepositForm } from "@/lib/types"
 
 export function useWallet() {
   const [wallet, setWallet] = useState<Wallet | null>(null)
@@ -36,28 +19,26 @@ export function useWallet() {
       const response = await apiClient.getWallet()
       setWallet(response)
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Ошибка получения баланса')
-      console.error('Error fetching wallet:', err)
+      setError(err.message || 'Ошибка получения баланса')
     } finally {
       setIsLoading(false)
     }
   }
 
   // Пополнить баланс
-  const deposit = async (data: DepositRequest) => {
+  const deposit = async (data: DepositForm) => {
     try {
       setIsLoading(true)
       setError(null)
       
-      await apiClient.depositWallet(data)
+      const response = await apiClient.depositWallet(data)
       
       // Обновляем баланс после пополнения
       await getWallet()
       
-      return { message: 'Баланс успешно пополнен' }
+      return { message: response.message }
     } catch (err: any) {
       setError(err.message || 'Ошибка пополнения баланса')
-      console.error('Error depositing:', err)
       throw err
     } finally {
       setIsLoading(false)
@@ -71,10 +52,9 @@ export function useWallet() {
       setError(null)
       
       const response = await apiClient.getWalletTransactions()
-      setTransactions(response || [])
+      setTransactions(response.transactions || [])
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Ошибка получения истории транзакций')
-      console.error('Error fetching transactions:', err)
+      setError(err.message || 'Ошибка получения истории транзакций')
     } finally {
       setIsLoading(false)
     }

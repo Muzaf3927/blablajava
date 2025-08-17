@@ -12,7 +12,7 @@ import RatingDisplay from "@/components/ratings/rating-display"
 export default function RatingsPage() {
   const [activeTab, setActiveTab] = useState("received")
   const [filterRating, setFilterRating] = useState("all")
-  const { receivedRatings, givenRatings, stats, loading, fetchReceivedRatings, fetchGivenRatings, fetchStats } =
+  const { receivedRatings, givenRatings, stats, isLoading, error, fetchReceivedRatings, fetchGivenRatings, fetchStats } =
     useRatings()
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function RatingsPage() {
     (rating) => filterRating === "all" || rating.rating.toString() === filterRating,
   )
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

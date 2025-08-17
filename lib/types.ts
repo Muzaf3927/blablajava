@@ -38,7 +38,7 @@ export interface Booking {
   trip_id: number;
   user_id: number;
   seats: number;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'declined' | 'cancelled';
   created_at: string;
   updated_at: string;
   trip?: Trip;
@@ -61,9 +61,14 @@ export interface Message {
 // Chat types
 export interface Chat {
   trip_id: number;
+  chat_partner_id: number;
+  last_message_at: string;
+  partner: {
+    id: number;
+    name: string;
+    avatar?: string;
+  };
   trip: Trip;
-  last_message?: Message;
-  unread_count: number;
 }
 
 // Notification types
@@ -149,7 +154,7 @@ export interface TripForm {
   to_city: string;
   date: string;
   time: string;
-  price: number | null;
+  price: number;
   seats: number;
   note?: string;
   carModel?: string;
@@ -159,10 +164,11 @@ export interface TripForm {
 
 export interface BookingForm {
   seats: number;
-  status?: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  status?: 'pending' | 'confirmed' | 'declined' | 'cancelled';
 }
 
 export interface MessageForm {
+  receiver_id: number;
   message: string;
 }
 
@@ -173,4 +179,5 @@ export interface RatingForm {
 
 export interface DepositForm {
   amount: number;
+  description?: string;
 } 

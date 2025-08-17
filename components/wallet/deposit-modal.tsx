@@ -34,8 +34,8 @@ export default function DepositModal({ isOpen, onClose, onSuccess }: DepositModa
     // Validation
     const newErrors: Record<string, string> = {}
     if (!formData.amount) newErrors.amount = "Сумма обязательна"
-    else if (Number.parseFloat(formData.amount) < 0.01) newErrors.amount = "Минимальная сумма 0.01 ₽"
-    else if (Number.parseFloat(formData.amount) > 100000) newErrors.amount = "Максимальная сумма 100,000 ₽"
+    else if (Number.parseFloat(formData.amount) < 1) newErrors.amount = "Минимальная сумма 1 сум"
+    else if (Number.parseFloat(formData.amount) > 1000000) newErrors.amount = "Максимальная сумма 1,000,000 сум"
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -43,7 +43,10 @@ export default function DepositModal({ isOpen, onClose, onSuccess }: DepositModa
     }
 
     try {
-      await deposit(Number.parseFloat(formData.amount), formData.description)
+      await deposit({
+        amount: Number.parseFloat(formData.amount),
+        description: formData.description || undefined
+      })
       setSuccess(true)
       setTimeout(() => {
         handleClose()
@@ -61,7 +64,7 @@ export default function DepositModal({ isOpen, onClose, onSuccess }: DepositModa
     onClose()
   }
 
-  const quickAmounts = [100, 500, 1000, 2000, 5000]
+  const quickAmounts = [1000, 5000, 10000, 25000, 50000]
 
   if (success) {
     return (
@@ -74,7 +77,7 @@ export default function DepositModal({ isOpen, onClose, onSuccess }: DepositModa
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Баланс пополнен!</h2>
               <p className="text-gray-600 mt-2">
-                Ваш баланс успешно пополнен на {Number.parseFloat(formData.amount).toLocaleString("ru-RU")} ₽
+                Ваш баланс успешно пополнен на {Number.parseFloat(formData.amount).toLocaleString("ru-RU")} сум
               </p>
             </div>
           </div>
@@ -107,9 +110,9 @@ export default function DepositModal({ isOpen, onClose, onSuccess }: DepositModa
               <Input
                 id="amount"
                 type="number"
-                min="0.01"
-                max="100000"
-                step="0.01"
+                min="1"
+                max="1000000"
+                step="1"
                 placeholder="Введите сумму"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
@@ -117,7 +120,7 @@ export default function DepositModal({ isOpen, onClose, onSuccess }: DepositModa
                   errors.amount ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-blue-500"
                 }`}
               />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">₽</div>
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">сум</div>
             </div>
             {errors.amount && <p className="text-red-500 text-sm">{errors.amount}</p>}
 

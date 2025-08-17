@@ -1,131 +1,68 @@
 "use client"
 
 import { useState } from "react"
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
-
-interface ChatMessage {
-  id: number
-  trip_id: number
-  sender_id: number
-  receiver_id: number
-  message: string
-  is_read: boolean
-  created_at: string
-  updated_at: string
-}
-
-interface Chat {
-  trip_id: number
-  chat_partner_id: number
-  last_message_at: string
-  unread_count: number
-  partner: {
-    id: number
-    name: string
-    avatar?: string
-  }
-  trip: {
-    id: number
-    from_city: string
-    to_city: string
-    date: string
-    time: string
-    price: number
-  }
-}
+import { apiClient } from "@/lib/api"
+import { Chat, Message } from "@/lib/types"
 
 export function useChat() {
   const [chats, setChats] = useState<Chat[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
-  const [loading, setLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("auth_token")
-    return {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    }
-  }
+  const [error, setError] = useState<string | null>(null)
 
   const fetchChats = async () => {
-    setLoading(true)
+    setIsLoading(true)
+    setError(null)
     try {
-      const response = await fetch(`${API_BASE_URL}/chats`, {
-        headers: getAuthHeaders(),
-      })
-
-      if (!response.ok) {
-        throw new Error("Ошибка получения чатов")
-      }
-
-      const data = await response.json()
-      setChats(data.chats || [])
-    } catch (error) {
-      console.error("Fetch chats error:", error)
-      throw error
+      const response = await apiClient.getUserChats()
+      setChats(response.chats || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ошибка получения чатов")
+      setChats([])
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/chats/unread-count`, {
-        headers: getAuthHeaders(),
-      })
-
-      if (!response.ok) {
-        throw new Error("Ошибка получения количества непрочитанных")
-      }
-
-      const data = await response.json()
-      setUnreadCount(data.unread_count || 0)
-    } catch (error) {
-      console.error("Fetch unread count error:", error)
+      const response = await apiClient.getUnreadCount()
+      setUnreadCount(response.unread_count || 0)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ошибка получения количества непрочитанных")
     }
   }
 
-  const fetchChatMessages = async (tripId: number, partnerId: number) => {
+  const fetchChatMessages = async (tripId: number, receiverId: number) => {
+    setIsLoading(true)
+    setError(null)
     try {
-      const response = await fetch(`${API_BASE_URL}/trips/${tripId}/chat/${partnerId}`, {
-        headers: getAuthHeaders(),
-      })
-
-      if (!response.ok) {
-        throw new Error("Ошибка получения сообщений")
-      }
-
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Fetch messages error:", error)
-      throw error
+      const response = await apiClient.getChatMessages(tripId, receiverId)
+      return response.messages || []
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ошибка получения сообщений")
+      throw err
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const sendMessage = async (tripId: number, receiverId: number, message: string) => {
     setIsLoading(true)
+    setError(null)
     try {
-      const response = await fetch(`${API_BASE_URL}/trips/${tripId}/chat`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          receiver_id: receiverId,
-          message: message,
-        }),
+      const response = await apiClient.sendMessage(tripId, {
+        receiver_id: receiverId,
+        message: message,
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || "Ошибка отправки сообщения")
-      }
-
-      return data
-    } catch (error) {
-      throw error
+      
+      // Обновляем количество непрочитанных сообщений
+      await fetchUnreadCount()
+      
+      return response.message
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ошибка отправки сообщения")
+      throw err
     } finally {
       setIsLoading(false)
     }
@@ -134,8 +71,8 @@ export function useChat() {
   return {
     chats,
     unreadCount,
-    loading,
     isLoading,
+    error,
     fetchChats,
     fetchUnreadCount,
     fetchChatMessages,

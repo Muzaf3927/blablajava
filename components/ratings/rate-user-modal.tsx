@@ -31,7 +31,7 @@ export default function RateUserModal({ isOpen, onClose, user, trip, onSuccess }
   const [rating, setRating] = useState(0)
   const [hoveredRating, setHoveredRating] = useState(0)
   const [comment, setComment] = useState("")
-  const { rateUser, loading } = useRatings()
+  const { rateUser, isLoading, error } = useRatings()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,7 +44,7 @@ export default function RateUserModal({ isOpen, onClose, user, trip, onSuccess }
       setRating(0)
       setComment("")
     } catch (error) {
-      console.error("Rate user error:", error)
+      // Ошибка уже обработана в хуке
     }
   }
 
@@ -90,6 +90,12 @@ export default function RateUserModal({ isOpen, onClose, user, trip, onSuccess }
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+          
           {/* User Info */}
           <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
             <Avatar className="w-12 h-12">
@@ -178,16 +184,16 @@ export default function RateUserModal({ isOpen, onClose, user, trip, onSuccess }
               variant="outline"
               onClick={onClose}
               className="flex-1 bg-transparent"
-              disabled={loading}
+              disabled={isLoading}
             >
               Отмена
             </Button>
             <Button
               type="submit"
-              disabled={rating === 0 || loading}
+              disabled={rating === 0 || isLoading}
               className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
-              {loading ? "Сохранение..." : "Оценить"}
+              {isLoading ? "Сохранение..." : "Оценить"}
             </Button>
           </div>
         </form>

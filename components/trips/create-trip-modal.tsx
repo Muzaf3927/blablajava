@@ -27,7 +27,7 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
     to_city: "",
     date: "",
     time: "",
-    price: null,
+    price: 0,
     seats: 1,
     note: "",
     carModel: "",
@@ -37,17 +37,17 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
 
   const { createTrip, isLoading } = useTrips()
 
-  const handlePriceChange = (value: number | null) => {
+  const handlePriceChange = (value: number) => {
     setFormData({ ...formData, price: value })
   }
 
   const increasePrice = () => {
-    const currentPrice = formData.price || 0
+    const currentPrice = formData.price
     handlePriceChange(currentPrice + 5000)
   }
 
   const decreasePrice = () => {
-    const currentPrice = formData.price || 0
+    const currentPrice = formData.price
     if (currentPrice >= 5000) {
       handlePriceChange(currentPrice - 5000)
     }
@@ -55,6 +55,12 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Валидация
+    if (!formData.from_city || !formData.to_city || !formData.date || !formData.time || formData.price <= 0) {
+      alert("Пожалуйста, заполните все обязательные поля и укажите цену больше 0")
+      return
+    }
     
     try {
       await createTrip(formData)
@@ -65,7 +71,7 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
         to_city: "",
         date: "",
         time: "",
-        price: null,
+        price: 0,
         seats: 1,
         note: "",
         carModel: "",
@@ -155,8 +161,8 @@ export function CreateTripModal({ isOpen, onClose }: CreateTripModalProps) {
                 <Input
                   id="price"
                   type="number"
-                  value={formData.price || ""}
-                  onChange={(e) => handlePriceChange(Number(e.target.value) || null)}
+                  value={formData.price}
+                  onChange={(e) => handlePriceChange(Number(e.target.value) || 0)}
                   className="flex-1"
                   min="0"
                   step="5000"

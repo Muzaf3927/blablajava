@@ -12,7 +12,7 @@ import { useChat } from "@/hooks/use-chat"
 export default function ChatsPage() {
   const [selectedChat, setSelectedChat] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const { chats, unreadCount, loading, fetchChats, fetchUnreadCount } = useChat()
+  const { chats, unreadCount, isLoading, error, fetchChats, fetchUnreadCount } = useChat()
 
   useEffect(() => {
     fetchChats()
@@ -34,7 +34,7 @@ export default function ChatsPage() {
       chat.trip?.to_city.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -110,11 +110,7 @@ export default function ChatsPage() {
                                 {chat.partner?.name?.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            {chat.unread_count > 0 && (
-                              <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                {chat.unread_count}
-                              </div>
-                            )}
+                            {/* Unread count will be shown in the main badge */}
                           </div>
 
                           <div className="flex-1 min-w-0">
