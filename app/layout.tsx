@@ -11,8 +11,6 @@ const inter = Inter({ subsets: ["latin", "cyrillic"] })
 export const metadata: Metadata = {
     title: "RideShare - Попутчики",
     description: "Современная платформа для поиска попутчиков",
-    viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-    themeColor: "#3b82f6",
     appleWebApp: {
         capable: true,
         statusBarStyle: "default",
@@ -21,6 +19,14 @@ export const metadata: Metadata = {
     formatDetection: {
         telephone: false,
     },
+}
+
+export const viewport = {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor: "#3b82f6",
 }
 
 export default function RootLayout({

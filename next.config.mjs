@@ -11,7 +11,6 @@ const nextConfig = {
   },
   // Оптимизации для мобильных устройств
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   // Сжатие и оптимизация
