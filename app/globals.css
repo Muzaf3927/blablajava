@@ -55,6 +55,29 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Оптимизации для мобильных устройств */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Отключаем выделение текста на мобильных */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Улучшаем производительность скролла */
+    -webkit-overflow-scrolling: touch;
+    /* Отключаем зум на мобильных */
+    touch-action: manipulation;
+  }
+  
+  /* Разрешаем выделение текста в полях ввода */
+  input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
   }
 }
 
@@ -97,6 +120,46 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Оптимизации для мобильных устройств */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Отключаем анимации на низкопроизводительных устройствах */
+@media (max-width: 768px) {
+  .animate-float,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
+  
+  /* Упрощаем тени для лучшей производительности */
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+}
+
+/* Оптимизации для touch устройств */
+@media (hover: none) and (pointer: coarse) {
+  /* Увеличиваем размеры кнопок для touch */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Улучшаем скролл */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .animate-gradient {
