@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -84,22 +85,22 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-16">
             {/* Логотип */}
             <div className="flex items-center space-x-4">
-              <a href="/" className="flex items-center space-x-2">
+              <Link href="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Car className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">RideShare</span>
-              </a>
+              </Link>
             </div>
 
             {/* Кнопка входа */}
             <div className="flex items-center space-x-4">
-              <a 
+              <Link 
                 href="/" 
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Войти
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -113,25 +114,25 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-16">
             {/* Логотип */}
             <div className="flex items-center space-x-4">
-              <a href="/trips" className="flex items-center space-x-2">
+              <Link href="/trips" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Car className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">RideShare</span>
-              </a>
+              </Link>
             </div>
 
             {/* Навигация для десктопа */}
             <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item) => (
-                  <a
+                  <Link
                       key={item.href}
                       href={item.href}
                       className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
                   >
                     <item.icon className="w-4 h-4" />
                     <span>{item.label}</span>
-                  </a>
+                  </Link>
               ))}
             </div>
 
@@ -160,7 +161,7 @@ export default function Navigation() {
               >
                 <div className="space-y-2">
                   {navItems.map((item) => (
-                      <a
+                      <Link
                           key={item.href}
                           href={item.href}
                           className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
@@ -168,7 +169,7 @@ export default function Navigation() {
                       >
                         <item.icon className="w-5 h-5" />
                         <span>{item.label}</span>
-                      </a>
+                      </Link>
                   ))}
                 </div>
               </motion.div>

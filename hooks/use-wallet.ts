@@ -13,13 +13,20 @@ export function useWallet() {
   // Получить баланс кошелька
   const getWallet = async () => {
     try {
+      console.log('=== WALLET: Getting wallet data ===')
       setIsLoading(true)
       setError(null)
       
       const response = await apiClient.getWallet()
+      console.log('=== WALLET: Response received:', response)
       setWallet(response)
     } catch (err: any) {
-      console.error('Error getting wallet:', err)
+      console.error('=== WALLET: Error getting wallet:', err)
+      console.error('=== WALLET: Error details:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name
+      })
       setError(err.message || 'Ошибка получения баланса')
       // Если ошибка 401, перенаправляем на главную страницу
       if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
@@ -55,13 +62,20 @@ export function useWallet() {
   // Получить историю транзакций
   const getTransactions = async () => {
     try {
+      console.log('=== WALLET: Getting transactions ===')
       setIsLoading(true)
       setError(null)
       
       const response = await apiClient.getWalletTransactions()
+      console.log('=== WALLET: Transactions response:', response)
       setTransactions(response.transactions || [])
     } catch (err: any) {
-      console.error('Error getting transactions:', err)
+      console.error('=== WALLET: Error getting transactions:', err)
+      console.error('=== WALLET: Transaction error details:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name
+      })
       setError(err.message || 'Ошибка получения истории транзакций')
       // Если ошибка 401, перенаправляем на главную страницу
       if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {

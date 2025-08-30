@@ -21,18 +21,24 @@ export default function WalletPage() {
       if (typeof window === 'undefined') return
       
       try {
+        console.log('=== WALLET PAGE: Checking authentication ===')
         const token = localStorage.getItem("auth_token")
         const userData = localStorage.getItem("user")
         
+        console.log('=== WALLET PAGE: Token exists:', !!token)
+        console.log('=== WALLET PAGE: User data exists:', !!userData)
+        
         if (token && userData) {
           setIsAuthenticated(true)
+          console.log('=== WALLET PAGE: User authenticated, loading wallet data ===')
           getWallet()
           getTransactions()
         } else {
+          console.log('=== WALLET PAGE: No auth data, redirecting to home ===')
           window.location.href = "/"
         }
       } catch (err) {
-        console.error('Error checking auth:', err)
+        console.error('=== WALLET PAGE: Error checking auth:', err)
         window.location.href = "/"
       }
     }
@@ -107,9 +113,10 @@ export default function WalletPage() {
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+  try {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -339,4 +346,26 @@ export default function WalletPage() {
       </div>
     </div>
   )
+  } catch (error) {
+    console.error('=== WALLET PAGE: Render error:', error)
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Произошла ошибка</h3>
+          <p className="text-gray-600 mb-4">Не удалось загрузить страницу кошелька</p>
+          <Button 
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Обновить страницу
+          </Button>
+        </div>
+      </div>
+    )
+  }
 }
