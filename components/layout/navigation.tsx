@@ -27,6 +27,8 @@ export default function Navigation() {
   // Дополнительная проверка localStorage для синхронизации состояния
   useEffect(() => {
     const checkLocalAuth = () => {
+      if (typeof window === 'undefined') return
+      
       const token = localStorage.getItem('auth_token')
       const userData = localStorage.getItem('user')
       setLocalAuthState(!!(token && userData))
@@ -44,16 +46,18 @@ export default function Navigation() {
       checkLocalAuth()
     }
 
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('authStateChanged', handleAuthStateChange)
-    
-    // Проверяем каждые 500мс для быстрого обновления
-    const interval = setInterval(checkLocalAuth, 500)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange)
+      window.addEventListener('authStateChanged', handleAuthStateChange)
+      
+      // Проверяем каждые 500мс для быстрого обновления
+      const interval = setInterval(checkLocalAuth, 500)
 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('authStateChanged', handleAuthStateChange)
-      clearInterval(interval)
+      return () => {
+        window.removeEventListener('storage', handleStorageChange)
+        window.removeEventListener('authStateChanged', handleAuthStateChange)
+        clearInterval(interval)
+      }
     }
   }, [])
 

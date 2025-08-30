@@ -17,6 +17,9 @@ export default function WalletPage() {
 
   useEffect(() => {
     const checkAuth = () => {
+      // Проверяем, что мы на клиенте
+      if (typeof window === 'undefined') return
+      
       const token = localStorage.getItem("auth_token")
       const userData = localStorage.getItem("user")
       

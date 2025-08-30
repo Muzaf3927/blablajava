@@ -12,14 +12,17 @@ export function useAuth() {
   // Проверяем токен при загрузке
   useEffect(() => {
     const checkAuth = async () => {
+      // Проверяем, что мы на клиенте
+      if (typeof window === 'undefined') return
+      
       console.log('=== AUTH CHECK START ===')
       console.log('Checking auth on mount...')
       
       // Проверяем токен в localStorage напрямую
-      const localStorageToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+      const localStorageToken = localStorage.getItem('auth_token')
       console.log('Token from localStorage:', localStorageToken ? localStorageToken.substring(0, 20) + '...' : 'null')
       
-          const token = apiClient.getToken()
+      const token = apiClient.getToken()
       
       if (token) {
         try {
@@ -31,9 +34,7 @@ export function useAuth() {
             console.log('User data received:', response)
             setUser(response)
             // Сохраняем пользователя в localStorage
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('user', JSON.stringify(response))
-            }
+            localStorage.setItem('user', JSON.stringify(response))
             setIsAuthenticated(true)
             console.log('User authenticated successfully')
           } else {
@@ -67,44 +68,40 @@ export function useAuth() {
       const response = await apiClient.login(credentials)
       console.log('Login response:', response)
       
-      if (response?.access_token) {
-        console.log('Access token found:', response.access_token)
-        setIsAuthenticated(true)
-        console.log('Login successful, token saved')
-        
-        // Если есть данные пользователя в ответе login, используем их
-        if (response.user) {
-          console.log('User data from login response:', response.user)
-          setUser(response.user)
-          // Сохраняем пользователя в localStorage
-          if (typeof window !== 'undefined') {
+              if (response?.access_token) {
+          console.log('Access token found:', response.access_token)
+          setIsAuthenticated(true)
+          console.log('Login successful, token saved')
+          
+          // Если есть данные пользователя в ответе login, используем их
+          if (response.user) {
+            console.log('User data from login response:', response.user)
+            setUser(response.user)
+            // Сохраняем пользователя в localStorage
             localStorage.setItem('user', JSON.stringify(response.user))
             console.log('User saved to localStorage:', JSON.stringify(response.user))
-          }
-          console.log('User state updated with login response data')
-        } else {
-          console.log('No user data in login response')
-          // Если нет данных пользователя в ответе login, получаем их отдельно
-          try {
-            console.log('Getting user data from /user endpoint...')
-            const userResponse = await apiClient.getCurrentUser()
-            console.log('User response from /user endpoint:', userResponse)
-            if (userResponse && typeof userResponse === 'object') {
-              setUser(userResponse)
-              // Сохраняем пользователя в localStorage
-              if (typeof window !== 'undefined') {
+            console.log('User state updated with login response data')
+          } else {
+            console.log('No user data in login response')
+            // Если нет данных пользователя в ответе login, получаем их отдельно
+            try {
+              console.log('Getting user data from /user endpoint...')
+              const userResponse = await apiClient.getCurrentUser()
+              console.log('User response from /user endpoint:', userResponse)
+              if (userResponse && typeof userResponse === 'object') {
+                setUser(userResponse)
+                // Сохраняем пользователя в localStorage
                 localStorage.setItem('user', JSON.stringify(userResponse))
                 console.log('User saved to localStorage from /user endpoint:', JSON.stringify(userResponse))
+                console.log('User data from /user endpoint:', userResponse)
               }
-              console.log('User data from /user endpoint:', userResponse)
+            } catch (userError) {
+              console.error('Failed to get user data:', userError)
             }
-          } catch (userError) {
-            console.error('Failed to get user data:', userError)
           }
+        } else {
+          console.log('No access_token in response')
         }
-      } else {
-        console.log('No access_token in response')
-      }
       
       console.log('=== LOGIN END ===')
       return response
@@ -145,10 +142,8 @@ export function useAuth() {
               console.log('User data from login response:', loginResponse.user)
               setUser(loginResponse.user)
               // Сохраняем пользователя в localStorage
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('user', JSON.stringify(loginResponse.user))
-                console.log('User saved to localStorage:', JSON.stringify(loginResponse.user))
-              }
+              localStorage.setItem('user', JSON.stringify(loginResponse.user))
+              console.log('User saved to localStorage:', JSON.stringify(loginResponse.user))
             } else {
               // Если нет данных пользователя в ответе login, получаем их отдельно
               try {
@@ -158,10 +153,8 @@ export function useAuth() {
                 if (userResponse && typeof userResponse === 'object') {
                   setUser(userResponse)
                   // Сохраняем пользователя в localStorage
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('user', JSON.stringify(userResponse))
-                    console.log('User saved to localStorage from /user endpoint:', JSON.stringify(userResponse))
-                  }
+                  localStorage.setItem('user', JSON.stringify(userResponse))
+                  console.log('User saved to localStorage from /user endpoint:', JSON.stringify(userResponse))
                 }
               } catch (userError) {
                 console.error('Failed to get user data:', userError)

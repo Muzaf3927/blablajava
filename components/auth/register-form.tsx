@@ -33,18 +33,16 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
   // Автоматическое перенаправление после успешной регистрации
   useEffect(() => {
-    if (success) {
+    if (success && typeof window !== 'undefined') {
       // Проверяем, есть ли токен в localStorage
       const token = localStorage.getItem('auth_token')
       const userData = localStorage.getItem('user')
       
       if (token && userData) {
         // Уведомляем другие компоненты об изменении состояния аутентификации
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('authStateChanged', { 
-            detail: { isAuthenticated: true, user: JSON.parse(userData) } 
-          }))
-        }
+        window.dispatchEvent(new CustomEvent('authStateChanged', { 
+          detail: { isAuthenticated: true, user: JSON.parse(userData) } 
+        }))
         
         // Небольшая задержка для показа сообщения об успехе и обновления состояния
         const timer = setTimeout(() => {

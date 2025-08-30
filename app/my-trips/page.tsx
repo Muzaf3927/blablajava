@@ -29,6 +29,9 @@ export default function MyTripsPage() {
   const router = useRouter()
 
   useEffect(() => {
+    // Проверяем, что мы на клиенте
+    if (typeof window === 'undefined') return
+    
     // Проверяем localStorage напрямую
     const token = localStorage.getItem("auth_token")
     const userData = localStorage.getItem("user")
@@ -83,7 +86,7 @@ export default function MyTripsPage() {
   const completedTrips = myTrips?.filter((trip) => trip?.status === "completed") || []
 
   // Показываем загрузку, если пользователь не аутентифицирован, но есть данные в localStorage
-  if (!isAuthenticated) {
+  if (!isAuthenticated && typeof window !== 'undefined') {
     const token = localStorage.getItem("auth_token")
     const userData = localStorage.getItem("user")
     
