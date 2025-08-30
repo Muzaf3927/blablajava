@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useRouter } from "next/navigation"
 import { 
   Wallet, 
   Calendar, 
@@ -22,11 +23,14 @@ import {
 import { useAuth } from "@/hooks/use-auth"
 import { useWallet } from "@/hooks/use-wallet"
 import { formatNumber, formatDate } from "@/lib/utils"
+import { CreateTripModal } from "@/components/trips/create-trip-modal"
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
+  const [showCreateTripModal, setShowCreateTripModal] = useState(false)
   const { user: currentUser } = useAuth()
   const { wallet, transactions } = useWallet()
+  const router = useRouter()
 
   useEffect(() => {
     const userData = localStorage.getItem("user")
@@ -111,13 +115,23 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Card 
+              className="hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => router.push(stat.href)}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color} ${stat.textColor}`}>
                     <stat.icon className="w-6 h-6" />
                   </div>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs cursor-pointer hover:bg-gray-200"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(stat.href)
+                    }}
+                  >
                     {stat.action}
                   </Badge>
                 </div>
@@ -147,15 +161,26 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button className="h-16 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <Button 
+                className="h-16 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                onClick={() => setShowCreateTripModal(true)}
+              >
                 <Car className="w-5 h-5 mr-2" />
                 Создать поездку
               </Button>
-              <Button variant="outline" className="h-16">
+              <Button 
+                variant="outline" 
+                className="h-16"
+                onClick={() => router.push('/trips')}
+              >
                 <Calendar className="w-5 h-5 mr-2" />
                 Найти поездку
               </Button>
-              <Button variant="outline" className="h-16">
+              <Button 
+                variant="outline" 
+                className="h-16"
+                onClick={() => router.push('/wallet')}
+              >
                 <Wallet className="w-5 h-5 mr-2" />
                 Пополнить баланс
               </Button>
@@ -181,7 +206,11 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               {recentTrips.map((trip) => (
-                <div key={trip.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div 
+                  key={trip.id} 
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => router.push(`/my-trips`)}
+                >
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       <MapPin className="w-4 h-4 text-green-600" />
@@ -253,13 +282,22 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-              <Button variant="outline">
+              <Button 
+                variant="outline"
+                onClick={() => router.push('/settings')}
+              >
                 Редактировать профиль
               </Button>
             </div>
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Модальное окно создания поездки */}
+      <CreateTripModal 
+        isOpen={showCreateTripModal} 
+        onClose={() => setShowCreateTripModal(false)} 
+      />
     </div>
   )
 } 

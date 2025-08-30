@@ -7,26 +7,36 @@ export function cn(...inputs: ClassValue[]) {
 
 // Безопасное форматирование чисел для SSR
 export function formatNumber(value: number, locale: string = "ru-RU"): string {
-  if (typeof window === 'undefined') {
-    // На сервере используем простое форматирование
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+  try {
+    if (typeof window === 'undefined') {
+      // На сервере используем простое форматирование
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+    }
+    
+    // На клиенте используем toLocaleString
+    return value.toLocaleString(locale)
+  } catch (error) {
+    console.error('Error formatting number:', error)
+    return value.toString()
   }
-  
-  // На клиенте используем toLocaleString
-  return value.toLocaleString(locale)
 }
 
 // Безопасное форматирование даты для SSR
 export function formatDate(date: string | Date, locale: string = "ru-RU"): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date
-  
-  if (typeof window === 'undefined') {
-    // На сервере используем ISO формат
-    return dateObj.toISOString()
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    if (typeof window === 'undefined') {
+      // На сервере используем ISO формат
+      return dateObj.toISOString()
+    }
+    
+    // На клиенте используем toLocaleString
+    return dateObj.toLocaleString(locale)
+  } catch (error) {
+    console.error('Error formatting date:', error)
+    return 'Неверная дата'
   }
-  
-  // На клиенте используем toLocaleString
-  return dateObj.toLocaleString(locale)
 }
 
 export function getAvatarUrl(avatar?: string): string {

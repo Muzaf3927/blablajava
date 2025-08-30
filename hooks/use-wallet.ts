@@ -23,7 +23,9 @@ export function useWallet() {
       setError(err.message || 'Ошибка получения баланса')
       // Если ошибка 401, перенаправляем на главную страницу
       if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-        window.location.href = '/'
+        if (typeof window !== 'undefined') {
+          window.location.href = '/'
+        }
       }
     } finally {
       setIsLoading(false)
@@ -63,7 +65,9 @@ export function useWallet() {
       setError(err.message || 'Ошибка получения истории транзакций')
       // Если ошибка 401, перенаправляем на главную страницу
       if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
-        window.location.href = '/'
+        if (typeof window !== 'undefined') {
+          window.location.href = '/'
+        }
       }
     } finally {
       setIsLoading(false)
@@ -77,8 +81,14 @@ export function useWallet() {
   }
 
   useEffect(() => {
-    getWallet()
-    getTransactions()
+    // Проверяем, что мы на клиенте и есть токен
+    if (typeof window === 'undefined') return
+    
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      getWallet()
+      getTransactions()
+    }
   }, [])
 
   return {

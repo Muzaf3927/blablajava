@@ -60,15 +60,29 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+      
+      // Проверяем, есть ли тело ответа
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        throw new Error('Неверный ответ от сервера');
+      }
 
       if (!response.ok) {
+        console.error('API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data
+        });
         throw new Error(data.message || data.error || `HTTP error! status: ${response.status}`);
       }
 
       // Laravel возвращает данные напрямую, а не в data поле
       return data;
     } catch (error) {
+      console.error('Request failed:', error);
       throw error;
     }
   }

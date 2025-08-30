@@ -20,14 +20,19 @@ export default function WalletPage() {
       // Проверяем, что мы на клиенте
       if (typeof window === 'undefined') return
       
-      const token = localStorage.getItem("auth_token")
-      const userData = localStorage.getItem("user")
-      
-      if (token && userData) {
-        setIsAuthenticated(true)
-        getWallet()
-        getTransactions()
-      } else {
+      try {
+        const token = localStorage.getItem("auth_token")
+        const userData = localStorage.getItem("user")
+        
+        if (token && userData) {
+          setIsAuthenticated(true)
+          getWallet()
+          getTransactions()
+        } else {
+          window.location.href = "/"
+        }
+      } catch (err) {
+        console.error('Error checking auth:', err)
         window.location.href = "/"
       }
     }
@@ -35,10 +40,10 @@ export default function WalletPage() {
     checkAuth()
   }, [getWallet, getTransactions])
 
-  const filteredTransactions = transactions.filter((transaction) => {
+  const filteredTransactions = transactions ? transactions.filter((transaction) => {
     if (filter === "all") return true
     return transaction.type === filter
-  })
+  }) : []
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -94,7 +99,10 @@ export default function WalletPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Загрузка данных кошелька...</p>
+        </div>
       </div>
     )
   }
@@ -127,6 +135,18 @@ export default function WalletPage() {
                 <div className="mt-2 text-sm text-red-700">
                   <p>{error}</p>
                 </div>
+                <div className="mt-2">
+                  <Button 
+                    onClick={() => {
+                      setError(null)
+                      getWallet()
+                      getTransactions()
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
+                  >
+                    Попробовать снова
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -149,7 +169,7 @@ export default function WalletPage() {
               <CardContent className="relative z-10 space-y-6">
                 <div>
                   <div className="text-4xl font-bold text-white mb-2">
-                    {formatNumber(wallet?.balance || 0)} сум
+                    {wallet ? formatNumber(wallet.balance || 0) : '0'} сум
                   </div>
                   <div className="text-white/70 text-sm">Доступно для использования</div>
                 </div>
@@ -176,7 +196,7 @@ export default function WalletPage() {
                     <div>
                       <p className="text-sm text-gray-600">Пополнений</p>
                       <p className="text-xl font-bold text-gray-900">
-                        {transactions.filter((t) => t.type === "deposit").length}
+                        {transactions ? transactions.filter((t) => t.type === "deposit").length : 0}
                       </p>
                     </div>
                   </div>
@@ -191,7 +211,7 @@ export default function WalletPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Операций</p>
-                      <p className="text-xl font-bold text-gray-900">{transactions.length}</p>
+                      <p className="text-xl font-bold text-gray-900">{transactions ? transactions.length : 0}</p>
                     </div>
                   </div>
                 </CardContent>
