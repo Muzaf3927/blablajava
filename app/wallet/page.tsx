@@ -13,6 +13,7 @@ export default function WalletPage() {
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [filter, setFilter] = useState<"all" | "deposit" | "withdrawal">("all")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [hasLoaded, setHasLoaded] = useState(false)
   const { wallet, transactions, isLoading, error, getWallet, getTransactions } = useWallet()
   
   // Убеждаемся, что transactions - это массив
@@ -31,12 +32,16 @@ export default function WalletPage() {
         console.log('=== WALLET PAGE: Token exists:', !!token)
         console.log('=== WALLET PAGE: User data exists:', !!userData)
         
-        if (token && userData) {
+        if (token && userData && !hasLoaded) {
           setIsAuthenticated(true)
+          setHasLoaded(true)
           console.log('=== WALLET PAGE: User authenticated, loading wallet data ===')
-          getWallet()
-          getTransactions()
-        } else {
+          // Вызываем функции только один раз при загрузке
+          setTimeout(() => {
+            getWallet()
+            getTransactions()
+          }, 100)
+        } else if (!token || !userData) {
           console.log('=== WALLET PAGE: No auth data, redirecting to home ===')
           window.location.href = "/"
         }
@@ -47,7 +52,7 @@ export default function WalletPage() {
     }
 
     checkAuth()
-  }, [getWallet, getTransactions])
+  }, []) // Убираем зависимости, чтобы useEffect вызывался только один раз
 
   const filteredTransactions = safeTransactions.filter((transaction) => {
     if (filter === "all") return true

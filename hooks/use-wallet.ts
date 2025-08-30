@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { apiClient } from "@/lib/api"
 import { Wallet, Transaction, DepositForm } from "@/lib/types"
 
@@ -11,7 +11,7 @@ export function useWallet() {
   const [error, setError] = useState<string | null>(null)
 
   // Получить баланс кошелька
-  const getWallet = async () => {
+  const getWallet = useCallback(async () => {
     try {
       console.log('=== WALLET: Getting wallet data ===')
       setIsLoading(true)
@@ -37,7 +37,7 @@ export function useWallet() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   // Пополнить баланс
   const deposit = async (data: DepositForm) => {
@@ -60,7 +60,7 @@ export function useWallet() {
   }
 
   // Получить историю транзакций
-  const getTransactions = async () => {
+  const getTransactions = useCallback(async () => {
     try {
       console.log('=== WALLET: Getting transactions ===')
       setIsLoading(true)
@@ -90,17 +90,17 @@ export function useWallet() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   // Обновить данные кошелька
-  const refreshWallet = () => {
+  const refreshWallet = useCallback(() => {
     try {
       getWallet()
       getTransactions()
     } catch (error) {
       console.error('=== WALLET: Error refreshing wallet:', error)
     }
-  }
+  }, [getWallet, getTransactions])
 
   useEffect(() => {
     // Проверяем, что мы на клиенте и есть токен
@@ -115,7 +115,7 @@ export function useWallet() {
     } catch (error) {
       console.error('=== WALLET: Error in useEffect:', error)
     }
-  }, [])
+  }, [getWallet, getTransactions])
 
   return {
     wallet,
