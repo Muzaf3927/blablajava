@@ -12,12 +12,25 @@ import { formatNumber, formatDate } from "@/lib/utils"
 export default function WalletPage() {
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [filter, setFilter] = useState<"all" | "deposit" | "withdrawal">("all")
-  const { wallet, transactions, isLoading, getWallet, getTransactions } = useWallet()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { wallet, transactions, isLoading, error, getWallet, getTransactions } = useWallet()
 
   useEffect(() => {
-    getWallet()
-    getTransactions()
-  }, [])
+    const checkAuth = () => {
+      const token = localStorage.getItem("auth_token")
+      const userData = localStorage.getItem("user")
+      
+      if (token && userData) {
+        setIsAuthenticated(true)
+        getWallet()
+        getTransactions()
+      } else {
+        window.location.href = "/"
+      }
+    }
+
+    checkAuth()
+  }, [getWallet, getTransactions])
 
   const filteredTransactions = transactions.filter((transaction) => {
     if (filter === "all") return true
@@ -63,6 +76,18 @@ export default function WalletPage() {
     }
   }
 
+  // Показываем загрузку, если пользователь не аутентифицирован
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Проверка аутентификации...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
@@ -84,6 +109,25 @@ export default function WalletPage() {
             <p className="text-gray-600 mt-1">Управляйте своими финансами</p>
           </div>
         </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Ошибка загрузки данных</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Balance Card */}

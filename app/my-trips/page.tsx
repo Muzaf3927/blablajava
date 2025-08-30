@@ -25,15 +25,30 @@ export default function MyTripsPage() {
   const hasFetched = useRef(false)
 
   const { myTrips, isLoading, fetchMyTrips } = useTrips()
-  const { user, logout } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!hasFetched.current) {
+    // Проверяем localStorage напрямую
+    const token = localStorage.getItem("auth_token")
+    const userData = localStorage.getItem("user")
+    
+    if (!isAuthenticated && (!token || !userData)) {
+      router.push("/")
+      return
+    }
+    
+    // Если есть данные в localStorage, но хук еще не обновился, ждем
+    if (!isAuthenticated && token && userData) {
+      return
+    }
+    
+    // Загружаем поездки только один раз при первой аутентификации
+    if (isAuthenticated && !hasFetched.current) {
       hasFetched.current = true
       fetchMyTrips()
     }
-  }, [fetchMyTrips])
+  }, [isAuthenticated, fetchMyTrips, router])
 
   const handleLogout = async () => {
     try {
@@ -66,6 +81,23 @@ export default function MyTripsPage() {
 
   const activeTrips = myTrips?.filter((trip) => trip?.status === "active") || []
   const completedTrips = myTrips?.filter((trip) => trip?.status === "completed") || []
+
+  // Показываем загрузку, если пользователь не аутентифицирован, но есть данные в localStorage
+  if (!isAuthenticated) {
+    const token = localStorage.getItem("auth_token")
+    const userData = localStorage.getItem("user")
+    
+    if (token && userData) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Проверка аутентификации...</p>
+          </div>
+        </div>
+      )
+    }
+  }
 
   if (isLoading) {
     return (

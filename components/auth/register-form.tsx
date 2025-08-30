@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { User, Phone, Lock, Eye, EyeOff, UserPlus } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
+import { useRouter } from "next/navigation"
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void
@@ -27,7 +28,37 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [success, setSuccess] = useState(false)
 
-  const { register, isLoading } = useAuth()
+  const { register, isLoading, isAuthenticated } = useAuth()
+  const router = useRouter()
+
+  // Автоматическое перенаправление после успешной регистрации
+  useEffect(() => {
+    if (success) {
+      // Проверяем, есть ли токен в localStorage
+      const token = localStorage.getItem('auth_token')
+      const userData = localStorage.getItem('user')
+      
+      if (token && userData) {
+        // Уведомляем другие компоненты об изменении состояния аутентификации
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('authStateChanged', { 
+            detail: { isAuthenticated: true, user: JSON.parse(userData) } 
+          }))
+        }
+        
+        // Небольшая задержка для показа сообщения об успехе и обновления состояния
+        const timer = setTimeout(() => {
+          router.push('/trips')
+          // Принудительно обновляем страницу через небольшую задержку для обновления навигации
+          setTimeout(() => {
+            window.location.reload()
+          }, 100)
+        }, 2000)
+        
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [success, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,13 +105,17 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                 <UserPlus className="w-8 h-8 text-white" />
               </motion.div>
               <h3 className="text-xl font-bold text-white mb-2">Регистрация успешна!</h3>
-              <p className="text-gray-300 mb-6">Теперь вы можете войти в свой аккаунт</p>
-              <Button
-                  onClick={onSwitchToLogin}
-                  className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700"
-              >
-                Войти в аккаунт
-              </Button>
+              <p className="text-gray-300 mb-6">
+                Вы автоматически вошли в систему. Перенаправление на страницу поездок...
+              </p>
+              <div className="flex items-center justify-center space-x-2">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                />
+                <span className="text-sm text-gray-300">Перенаправление...</span>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

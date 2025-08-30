@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MapPin, Calendar, Clock, Users, Star, X, CheckCircle } from "lucide-react"
-import Navigation from "@/components/layout/navigation"
 
 interface Booking {
   id: number
@@ -33,15 +32,22 @@ interface Booking {
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token")
-    if (!token) {
-      window.location.href = "/"
-      return
+    const checkAuth = () => {
+      const token = localStorage.getItem("auth_token")
+      const userData = localStorage.getItem("user")
+      
+      if (token && userData) {
+        setIsAuthenticated(true)
+        fetchBookings()
+      } else {
+        window.location.href = "/"
+      }
     }
 
-    fetchBookings()
+    checkAuth()
   }, [])
 
   const fetchBookings = async () => {
@@ -61,15 +67,24 @@ export default function BookingsPage() {
   const completedBookings = bookings.filter((booking) => booking.status === "completed")
   const cancelledBookings = bookings.filter((booking) => booking.status === "cancelled")
 
+  // Показываем загрузку, если пользователь не аутентифицирован
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Проверка аутентификации...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-          <Navigation />
-          <div className="container mx-auto px-4 py-8">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600">Загрузка бронирований...</p>
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Загрузка бронирований...</p>
           </div>
         </div>
     )
@@ -191,7 +206,6 @@ export default function BookingsPage() {
 
   return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <Navigation />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">

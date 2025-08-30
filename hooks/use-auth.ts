@@ -119,27 +119,85 @@ export function useAuth() {
   const register = async (userData: RegisterForm) => {
     setIsLoading(true)
     try {
-      const response = await apiClient.register(userData)
+      console.log('=== REGISTER START ===')
+      console.log('Attempting registration with:', userData)
       
-      // После регистрации нужно войти в систему
-      if (response.data) {
-        // Попробуем автоматически войти после регистрации
+      const response = await apiClient.register(userData)
+      console.log('Registration response:', response)
+      
+      // После успешной регистрации автоматически входим в систему
+      if (response) {
+        console.log('Registration successful, attempting auto-login...')
         try {
           const loginResponse = await apiClient.login({
             phone: userData.phone,
             password: userData.password
           })
-                  if (loginResponse.data?.user) {
-          setUser(loginResponse.data.user)
-          setIsAuthenticated(true)
-        }
+          
+          console.log('Auto-login response:', loginResponse)
+          
+          if (loginResponse?.access_token) {
+            console.log('Auto-login successful, setting user data...')
+            setIsAuthenticated(true)
+            
+            // Если есть данные пользователя в ответе login, используем их
+            if (loginResponse.user) {
+              console.log('User data from login response:', loginResponse.user)
+              setUser(loginResponse.user)
+              // Сохраняем пользователя в localStorage
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('user', JSON.stringify(loginResponse.user))
+                console.log('User saved to localStorage:', JSON.stringify(loginResponse.user))
+              }
+            } else {
+              // Если нет данных пользователя в ответе login, получаем их отдельно
+              try {
+                console.log('Getting user data from /user endpoint...')
+                const userResponse = await apiClient.getCurrentUser()
+                console.log('User response from /user endpoint:', userResponse)
+                if (userResponse && typeof userResponse === 'object') {
+                  setUser(userResponse)
+                  // Сохраняем пользователя в localStorage
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('user', JSON.stringify(userResponse))
+                    console.log('User saved to localStorage from /user endpoint:', JSON.stringify(userResponse))
+                  }
+                }
+              } catch (userError) {
+                console.error('Failed to get user data:', userError)
+              }
+            }
+            
+            // Принудительно обновляем состояние аутентификации
+            setTimeout(() => {
+              setIsAuthenticated(true)
+              // Принудительно обновляем состояние несколько раз для надежности
+              const updateInterval = setInterval(() => {
+                setIsAuthenticated(true)
+              }, 100)
+              
+              setTimeout(() => {
+                clearInterval(updateInterval)
+              }, 1000)
+              
+              // Уведомляем другие компоненты об изменении состояния
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('authStateChanged', { 
+                  detail: { isAuthenticated: true, user: loginResponse.user || userResponse } 
+                }))
+              }
+            }, 100)
+          }
         } catch (loginError) {
           console.error("Auto-login after registration failed:", loginError)
+          throw new Error("Регистрация прошла успешно, но не удалось войти в систему. Попробуйте войти вручную.")
         }
       }
       
+      console.log('=== REGISTER END ===')
       return response
     } catch (error) {
+      console.error('Registration error:', error)
       throw error
     } finally {
       setIsLoading(false)

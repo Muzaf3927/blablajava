@@ -20,8 +20,42 @@ import { Car, Calendar, MessageCircle, Wallet, Star, Settings, User, LogOut, Men
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [localAuthState, setLocalAuthState] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
   const router = useRouter()
+
+  // Дополнительная проверка localStorage для синхронизации состояния
+  useEffect(() => {
+    const checkLocalAuth = () => {
+      const token = localStorage.getItem('auth_token')
+      const userData = localStorage.getItem('user')
+      setLocalAuthState(!!(token && userData))
+    }
+
+    checkLocalAuth()
+    
+    // Слушаем изменения в localStorage
+    const handleStorageChange = () => {
+      checkLocalAuth()
+    }
+
+    // Слушаем событие изменения состояния аутентификации
+    const handleAuthStateChange = () => {
+      checkLocalAuth()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('authStateChanged', handleAuthStateChange)
+    
+    // Проверяем каждые 500мс для быстрого обновления
+    const interval = setInterval(checkLocalAuth, 500)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('authStateChanged', handleAuthStateChange)
+      clearInterval(interval)
+    }
+  }, [])
 
   const handleLogout = async () => {
     await logout()
@@ -39,7 +73,7 @@ export default function Navigation() {
   ]
 
   // Простая навигация для неавторизованных пользователей
-  if (!isAuthenticated || !user) {
+  if ((!isAuthenticated && !localAuthState) || !user) {
     return (
       <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="container mx-auto px-4">

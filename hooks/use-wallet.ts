@@ -19,7 +19,12 @@ export function useWallet() {
       const response = await apiClient.getWallet()
       setWallet(response)
     } catch (err: any) {
+      console.error('Error getting wallet:', err)
       setError(err.message || 'Ошибка получения баланса')
+      // Если ошибка 401, перенаправляем на главную страницу
+      if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+        window.location.href = '/'
+      }
     } finally {
       setIsLoading(false)
     }
@@ -54,7 +59,12 @@ export function useWallet() {
       const response = await apiClient.getWalletTransactions()
       setTransactions(response.transactions || [])
     } catch (err: any) {
+      console.error('Error getting transactions:', err)
       setError(err.message || 'Ошибка получения истории транзакций')
+      // Если ошибка 401, перенаправляем на главную страницу
+      if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
+        window.location.href = '/'
+      }
     } finally {
       setIsLoading(false)
     }
