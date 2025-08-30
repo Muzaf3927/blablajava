@@ -68,7 +68,11 @@ export function useWallet() {
       
       const response = await apiClient.getWalletTransactions()
       console.log('=== WALLET: Transactions response:', response)
-      setTransactions(response.transactions || [])
+      
+      // Убеждаемся, что transactions - это массив
+      const transactionsArray = Array.isArray(response.transactions) ? response.transactions : []
+      console.log('=== WALLET: Transactions array:', transactionsArray)
+      setTransactions(transactionsArray)
     } catch (err: any) {
       console.error('=== WALLET: Error getting transactions:', err)
       console.error('=== WALLET: Transaction error details:', {
@@ -90,18 +94,26 @@ export function useWallet() {
 
   // Обновить данные кошелька
   const refreshWallet = () => {
-    getWallet()
-    getTransactions()
+    try {
+      getWallet()
+      getTransactions()
+    } catch (error) {
+      console.error('=== WALLET: Error refreshing wallet:', error)
+    }
   }
 
   useEffect(() => {
     // Проверяем, что мы на клиенте и есть токен
     if (typeof window === 'undefined') return
     
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      getWallet()
-      getTransactions()
+    try {
+      const token = localStorage.getItem('auth_token')
+      if (token) {
+        getWallet()
+        getTransactions()
+      }
+    } catch (error) {
+      console.error('=== WALLET: Error in useEffect:', error)
     }
   }, [])
 

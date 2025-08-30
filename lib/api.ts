@@ -301,9 +301,17 @@ class ApiClient {
   }
 
   async getWalletTransactions() {
-    return this.request<{ 
+    const response = await this.request<{ 
       transactions: Transaction[]; 
     }>('/wallet/transactions');
+    
+    // Убеждаемся, что transactions - это массив
+    if (response && !Array.isArray(response.transactions)) {
+      console.warn('API returned non-array transactions:', response.transactions)
+      return { transactions: [] }
+    }
+    
+    return response
   }
 
   // Ratings endpoints

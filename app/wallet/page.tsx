@@ -14,6 +14,9 @@ export default function WalletPage() {
   const [filter, setFilter] = useState<"all" | "deposit" | "withdrawal">("all")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const { wallet, transactions, isLoading, error, getWallet, getTransactions } = useWallet()
+  
+  // Убеждаемся, что transactions - это массив
+  const safeTransactions = Array.isArray(transactions) ? transactions : []
 
   useEffect(() => {
     const checkAuth = () => {
@@ -46,10 +49,10 @@ export default function WalletPage() {
     checkAuth()
   }, [getWallet, getTransactions])
 
-  const filteredTransactions = transactions ? transactions.filter((transaction) => {
+  const filteredTransactions = safeTransactions.filter((transaction) => {
     if (filter === "all") return true
     return transaction.type === filter
-  }) : []
+  })
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -203,7 +206,7 @@ export default function WalletPage() {
                     <div>
                       <p className="text-sm text-gray-600">Пополнений</p>
                       <p className="text-xl font-bold text-gray-900">
-                        {transactions ? transactions.filter((t) => t.type === "deposit").length : 0}
+                        {safeTransactions.filter((t) => t.type === "deposit").length}
                       </p>
                     </div>
                   </div>
@@ -218,7 +221,7 @@ export default function WalletPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Операций</p>
-                      <p className="text-xl font-bold text-gray-900">{transactions ? transactions.length : 0}</p>
+                      <p className="text-xl font-bold text-gray-900">{safeTransactions.length}</p>
                     </div>
                   </div>
                 </CardContent>
