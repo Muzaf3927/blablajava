@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,19 +20,12 @@ import { Car, Calendar, MessageCircle, Wallet, Star, Settings, User, LogOut, Men
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isHomePage, setIsHomePage] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
-  // Проверяем, находимся ли мы на главной странице
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setIsHomePage(window.location.pathname === '/')
-    }
-  }, [])
-
-  // Скрываем навигацию на главной странице
-  if (isHomePage) {
+  // Скрываем навигацию только на главной странице
+  if (pathname === '/') {
     return null
   }
 
