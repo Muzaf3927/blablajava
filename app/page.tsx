@@ -174,10 +174,10 @@ function HomePageContent() {
                     transition={{ delay: 0.3 }}
                     className="text-5xl lg:text-6xl font-bold leading-tight"
                 >
-                  Современный сервис для поиска
+                  Экономьте деньги
                   <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                   {" "}
-                  попутчиков и поездок
+                  на поездках
                 </span>
                 </motion.h1>
 

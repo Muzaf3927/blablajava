@@ -25,33 +25,15 @@ export default function MyTripsPage() {
   const hasFetched = useRef(false)
 
   const { myTrips, isLoading, fetchMyTrips } = useTrips()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, logout } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    // Проверяем, что мы на клиенте
-    if (typeof window === 'undefined') return
-    
-    // Проверяем localStorage напрямую
-    const token = localStorage.getItem("auth_token")
-    const userData = localStorage.getItem("user")
-    
-    if (!isAuthenticated && (!token || !userData)) {
-      router.push("/")
-      return
-    }
-    
-    // Если есть данные в localStorage, но хук еще не обновился, ждем
-    if (!isAuthenticated && token && userData) {
-      return
-    }
-    
-    // Загружаем поездки только один раз при первой аутентификации
-    if (isAuthenticated && !hasFetched.current) {
+    if (!hasFetched.current) {
       hasFetched.current = true
       fetchMyTrips()
     }
-  }, [isAuthenticated, fetchMyTrips, router])
+  }, [fetchMyTrips])
 
   const handleLogout = async () => {
     try {
@@ -84,23 +66,6 @@ export default function MyTripsPage() {
 
   const activeTrips = myTrips?.filter((trip) => trip?.status === "active") || []
   const completedTrips = myTrips?.filter((trip) => trip?.status === "completed") || []
-
-  // Показываем загрузку, если пользователь не аутентифицирован, но есть данные в localStorage
-  if (!isAuthenticated && typeof window !== 'undefined') {
-    const token = localStorage.getItem("auth_token")
-    const userData = localStorage.getItem("user")
-    
-    if (token && userData) {
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Проверка аутентификации...</p>
-          </div>
-        </div>
-      )
-    }
-  }
 
   if (isLoading) {
     return (
@@ -241,18 +206,18 @@ export default function MyTripsPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-            <CardContent className="p-8">
-              <div className="flex items-center space-x-6">
-                <div className="w-16 h-16 bg-white/25 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Plus className="w-8 h-8" />
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <Plus className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3">Создать поездку</h3>
-                  <p className="text-blue-100 mb-6 text-lg leading-relaxed">Предложите поездку и найдите попутчиков для совместного путешествия</p>
+                  <h3 className="text-xl font-semibold mb-2">Создать поездку</h3>
+                  <p className="text-blue-100 mb-4">Предложите поездку и найдите попутчиков</p>
                   <Button
                     onClick={() => setShowCreateModal(true)}
-                    className="bg-white text-blue-700 hover:bg-blue-50 font-semibold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="bg-white text-blue-600 hover:bg-gray-100 font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-white"
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     Создать поездку
@@ -262,18 +227,18 @@ export default function MyTripsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-            <CardContent className="p-8">
-              <div className="flex items-center space-x-6">
-                <div className="w-16 h-16 bg-white/25 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Search className="w-8 h-8" />
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <Search className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3">Найти поездку</h3>
-                  <p className="text-purple-100 mb-6 text-lg leading-relaxed">Найдите подходящую поездку и забронируйте место для комфортного путешествия</p>
+                  <h3 className="text-xl font-semibold mb-2">Найти поездку</h3>
+                  <p className="text-purple-100 mb-4">Найдите подходящую поездку и забронируйте место</p>
                   <Button
                     onClick={() => router.push("/trips")}
-                    className="bg-white text-purple-700 hover:bg-purple-50 font-semibold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-white"
                   >
                     <Search className="w-5 h-5 mr-2" />
                     Найти поездку
@@ -320,7 +285,7 @@ export default function MyTripsPage() {
                   <p className="text-gray-600 mb-6">Создайте свою первую поездку и найдите попутчиков</p>
                   <Button
                     onClick={() => setShowCreateModal(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                    className="bg-white text-blue-600 hover:bg-gray-100 font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 border-2 border-white"
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     Создать поездку
