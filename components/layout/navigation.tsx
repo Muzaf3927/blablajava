@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,46 +20,21 @@ import { Car, Calendar, MessageCircle, Wallet, Star, Settings, User, LogOut, Men
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [localAuthState, setLocalAuthState] = useState(false)
+  const [isHomePage, setIsHomePage] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
   const router = useRouter()
 
-  // Дополнительная проверка localStorage для синхронизации состояния
+  // Проверяем, находимся ли мы на главной странице
   useEffect(() => {
-    const checkLocalAuth = () => {
-      if (typeof window === 'undefined') return
-      
-      const token = localStorage.getItem('auth_token')
-      const userData = localStorage.getItem('user')
-      setLocalAuthState(!!(token && userData))
-    }
-
-    checkLocalAuth()
-    
-    // Слушаем изменения в localStorage
-    const handleStorageChange = () => {
-      checkLocalAuth()
-    }
-
-    // Слушаем событие изменения состояния аутентификации
-    const handleAuthStateChange = () => {
-      checkLocalAuth()
-    }
-
     if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleStorageChange)
-      window.addEventListener('authStateChanged', handleAuthStateChange)
-      
-      // Проверяем каждые 500мс для быстрого обновления
-      const interval = setInterval(checkLocalAuth, 500)
-
-      return () => {
-        window.removeEventListener('storage', handleStorageChange)
-        window.removeEventListener('authStateChanged', handleAuthStateChange)
-        clearInterval(interval)
-      }
+      setIsHomePage(window.location.pathname === '/')
     }
   }, [])
+
+  // Скрываем навигацию на главной странице
+  if (isHomePage) {
+    return null
+  }
 
   const handleLogout = async () => {
     await logout()
@@ -78,29 +52,29 @@ export default function Navigation() {
   ]
 
   // Простая навигация для неавторизованных пользователей
-  if ((!isAuthenticated && !localAuthState) || !user) {
+  if (!isAuthenticated || !user) {
     return (
       <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             {/* Логотип */}
             <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
+              <a href="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Car className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">RideShare</span>
-              </Link>
+              </a>
             </div>
 
             {/* Кнопка входа */}
             <div className="flex items-center space-x-4">
-              <Link 
+              <a 
                 href="/" 
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Войти
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -114,25 +88,25 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-16">
             {/* Логотип */}
             <div className="flex items-center space-x-4">
-              <Link href="/trips" className="flex items-center space-x-2">
+              <a href="/trips" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Car className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">RideShare</span>
-              </Link>
+              </a>
             </div>
 
             {/* Навигация для десктопа */}
             <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item) => (
-                  <Link
+                  <a
                       key={item.href}
                       href={item.href}
                       className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
                   >
                     <item.icon className="w-4 h-4" />
                     <span>{item.label}</span>
-                  </Link>
+                  </a>
               ))}
             </div>
 
@@ -161,7 +135,7 @@ export default function Navigation() {
               >
                 <div className="space-y-2">
                   {navItems.map((item) => (
-                      <Link
+                      <a
                           key={item.href}
                           href={item.href}
                           className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
@@ -169,7 +143,7 @@ export default function Navigation() {
                       >
                         <item.icon className="w-5 h-5" />
                         <span>{item.label}</span>
-                      </Link>
+                      </a>
                   ))}
                 </div>
               </motion.div>

@@ -174,10 +174,10 @@ function HomePageContent() {
                     transition={{ delay: 0.3 }}
                     className="text-5xl lg:text-6xl font-bold leading-tight"
                 >
-                  Путешествуйте
+                  Современный сервис для поиска
                   <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                   {" "}
-                    вместе
+                  попутчиков и поездок
                 </span>
                 </motion.h1>
 
@@ -187,8 +187,8 @@ function HomePageContent() {
                     transition={{ delay: 0.4 }}
                     className="text-xl text-gray-300 leading-relaxed"
                 >
-                  Современная платформа для поиска попутчиков. Экономьте деньги, находите новых друзей и путешествуйте
-                  комфортно.
+                  Найдите попутчиков или водителя, разделите расходы на дорогу и сэкономьте на такси. Быстро,
+                  удобно и безопасно — без случайных попутчиков с трассы.
                 </motion.p>
               </div>
 
