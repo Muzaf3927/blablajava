@@ -21,6 +21,7 @@ interface BookTripModalProps {
 export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: BookTripModalProps) {
   const [seats, setSeats] = useState(1)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showInfoModal, setShowInfoModal] = useState(false)
 
   const { createBooking, isLoading } = useBookings()
 
@@ -39,11 +40,18 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
       return
     }
 
+    // Показываем информационное модальное окно
+    setShowInfoModal(true)
+  }
+
+  const handleConfirmBooking = async () => {
     try {
       await createBooking(trip.id, seats)
+      setShowInfoModal(false)
       onSuccess()
     } catch (error: any) {
       setErrors({ general: error.message || "Ошибка бронирования" })
+      setShowInfoModal(false)
     }
   }
 
@@ -190,9 +198,16 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
                   </span>
                   <span>{totalPrice.toLocaleString("ru-RU")} ₽</span>
                 </div>
+                <div className="flex justify-between text-sm text-blue-600">
+                  <span>Комиссия (3%):</span>
+                  <span>{(totalPrice * 0.03).toLocaleString("ru-RU")} ₽</span>
+                </div>
                 <div className="flex justify-between text-lg font-bold text-green-800 pt-2 border-t border-green-200">
                   <span>Итого:</span>
                   <span>{totalPrice.toLocaleString("ru-RU")} ₽</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  * Комиссия спишется после завершения поездки
                 </div>
               </div>
             </div>
@@ -224,6 +239,79 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
               </Button>
             </div>
           </form>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Информационное модальное окно */}
+    <Dialog open={showInfoModal} onOpenChange={setShowInfoModal}>
+      <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-lg border-0 shadow-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-center text-gray-900">
+            Важная информация о бронировании
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* Иконка */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Информация */}
+          <div className="space-y-4 text-center">
+            <div className="bg-blue-50 rounded-xl p-4">
+              <h3 className="font-semibold text-blue-900 mb-2">Комиссия за бронирование</h3>
+              <p className="text-blue-700 text-sm">
+                За бронирование с вас спишется <strong>3% от стоимости поездки</strong> после завершения поездки.
+              </p>
+            </div>
+
+            <div className="bg-green-50 rounded-xl p-4">
+              <h3 className="font-semibold text-green-900 mb-2">Система оценок</h3>
+              <p className="text-green-700 text-sm">
+                В конце поездки водитель поставит вам оценку. <strong>Ведите себя хорошо</strong> для получения высокого рейтинга.
+              </p>
+            </div>
+
+            <div className="bg-yellow-50 rounded-xl p-4">
+              <h3 className="font-semibold text-yellow-900 mb-2">Правила поведения</h3>
+              <p className="text-yellow-700 text-sm">
+                Будьте вежливы, соблюдайте чистоту в салоне и приходите вовремя. Это поможет получить хорошие отзывы.
+              </p>
+            </div>
+          </div>
+
+          {/* Кнопки */}
+          <div className="flex space-x-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowInfoModal(false)}
+              className="flex-1 h-12 rounded-xl border-2 bg-transparent"
+            >
+              Отмена
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmBooking}
+              disabled={isLoading}
+              className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Бронирование...</span>
+                </div>
+              ) : (
+                "Подтвердить бронирование"
+              )}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
