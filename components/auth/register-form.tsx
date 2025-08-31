@@ -46,7 +46,7 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         
         // Небольшая задержка для показа сообщения об успехе и обновления состояния
         const timer = setTimeout(() => {
-          router.push('/trips')
+          router.push('/my-trips')
           // Принудительно обновляем страницу через небольшую задержку для обновления навигации
           setTimeout(() => {
             window.location.reload()
