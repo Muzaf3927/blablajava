@@ -6,8 +6,9 @@ import { useSearchParams } from "next/navigation"
 import LoginForm from "@/components/auth/login-form"
 import RegisterForm from "@/components/auth/register-form"
 import ResetPasswordForm from "@/components/auth/reset-password-form"
-import { Car, Users, Shield, Star, ArrowRight, Sparkles } from "lucide-react"
+import { Car, Users, Shield, Star, ArrowRight, Sparkles, LogOut } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function HomePage() {
   return (
@@ -22,6 +23,7 @@ function HomePageContent() {
   const [currentForm, setCurrentForm] = useState<"login" | "register" | "reset">("login")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const { logout } = useAuth()
 
   useEffect(() => {
     const checkAuth = () => {
@@ -117,7 +119,7 @@ function HomePageContent() {
         <div className="relative z-10 container mx-auto px-4 py-8">
           {/* Навигация */}
           {isAuthenticated && (
-              <div className="absolute top-4 right-4">
+              <div className="absolute top-4 right-4 flex space-x-3">
                 <motion.a
                     href="/trips"
                     className="bg-white/10 backdrop-blur-lg border border-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
@@ -125,6 +127,25 @@ function HomePageContent() {
                 >
                   Перейти к поездкам
                 </motion.a>
+                <motion.button
+                    onClick={async () => {
+                      try {
+                        await logout()
+                        window.location.reload()
+                      } catch (error) {
+                        console.error('Ошибка выхода:', error)
+                        // Если не удалось выйти через API, очищаем localStorage
+                        localStorage.removeItem('auth_token')
+                        localStorage.removeItem('user')
+                        window.location.reload()
+                      }
+                    }}
+                    className="bg-red-500/20 backdrop-blur-lg border border-red-300/30 text-white px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all duration-300 flex items-center space-x-2"
+                    whileHover={{ scale: 1.05 }}
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Выйти</span>
+                </motion.button>
               </div>
           )}
 
