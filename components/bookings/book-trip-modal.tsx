@@ -58,7 +58,8 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
   const totalPrice = trip.price * seats
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg bg-white/95 backdrop-blur-lg border-0 shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -315,5 +316,6 @@ export default function BookTripModal({ isOpen, trip, onClose, onSuccess }: Book
         </div>
       </DialogContent>
     </Dialog>
+    </>
   )
 }
